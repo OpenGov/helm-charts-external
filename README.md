@@ -13,7 +13,9 @@ helm repo index .
 ```
 
 4. Add the repo to helm repo list:
+```
 helm repo add helm-external-repo  --username <github_username> --password <Personal Access Token> 'https://raw.githubusercontent.com/opengov/helm-charts-external/master/'
+```
 
 5. Check if repo exists in helm repo list:
 ```
