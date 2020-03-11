@@ -30,11 +30,11 @@ spec:
     - host: {{ . | quote }}
       http:
         paths:
-	{{- range $ingressPaths }}
+{{- range $ingressPaths }}
           - path: /
             backend:
               serviceName: rundeck
               servicePort: 80
-	{{- end }}
+{{- end }}
   {{- end }}
 {{- end }}

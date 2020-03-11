@@ -6,4 +6,3 @@ ingress:
   paths: ["/"]
   hosts:
     - vouch.internal.production.opengov.zone
-    

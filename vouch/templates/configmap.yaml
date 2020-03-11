@@ -17,4 +17,3 @@ data:
     oauth:
 {{ toYaml .Values.config.oauth | indent 6 }}
 {{- end }}
-
