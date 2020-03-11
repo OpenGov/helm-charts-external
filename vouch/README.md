@@ -9,11 +9,11 @@ Current chart version is `0.1.3`
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| fullnameOverride | string | `""` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"voucher/vouch-proxy"` |  |
-| image.tag | string | `"{{ .Chart.AppVersion }}"` |  |
-| nameOverride | string | `""` |  |
+| fullnameOverride | string | `` |  |
+| image.pullPolicy | string | `IfNotPresent` |  |
+| image.repository | string | `opengovorg/vouch-proxy` |  |
+| image.tag | string | `{{ .Chart.AppVersion }}` |  |
+| nameOverride | string | `` |  |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
 
