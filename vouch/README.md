@@ -17,4 +17,4 @@ Current chart version is `0.1.3`.
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
 
-The Helm Chart we are using is maintained by [halkeye](https://github.com/halkeye) and are available at this [repository](https://github.com/halkeye-helm-charts/vouch).
+The Helm Chart we are using is maintained by [halkeye](https://github.com/halkeye) and are available at this [repository](https://github.com/halkeye-helm-charts/vouch/commit/cac22d872ab23bbc2cba4d1d7fb09f9e5a746359).
