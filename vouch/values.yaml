@@ -1,6 +1,6 @@
 replicaCount: 1
 image:
-  repository: voucher/vouch-proxy
+  repository: opengovorg/vouch-proxy
   tag: "{{ .Chart.AppVersion }}"
   pullPolicy: IfNotPresent
 nameOverride: ""
