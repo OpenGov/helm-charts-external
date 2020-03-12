@@ -17,12 +17,20 @@ spec:
     metadata:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        sumologic.com/sourceCategory: 'vouch'
-        sumologic.com/sourceName: 'vouch'
+        {{- range $key, $value := .Values.annotations.deployment }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
       labels:
         app.kubernetes.io/name: {{ include "vouch.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      {{- if .Values.annotations.pod }}
+      template:
+        metadata:
+          annotations:
+          {{- range $key, $value := .Values.pod.annotations }}
+            {{ $key }}: {{ $value | quote }}
+          {{- end }}
       {{- if .Values.dnsConfig }}
       dnsConfig:
         {{- toYaml .Values.dnsConfig | nindent 8 }}
@@ -68,3 +76,13 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+
+
+      {{- if .Values.rundeck.pod.annotations }}
+      template:
+        metadata:
+          annotations:
+          {{- range $key, $value := .Values.rundeck.pod.annotations }}
+            {{ $key }}: {{ $value | quote }}
+          {{- end }}
+      {{- end }}
