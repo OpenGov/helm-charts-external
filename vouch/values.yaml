@@ -18,9 +18,9 @@ resources: {}
   #   memory: 256Mi
 annotations:
   deployment:
-  - description: "this is for deployment"
+    desc: "this is for deployment"
   pod:
-  - description: "this is for pod"
+    desc: "this is for pod"
       
 ingress:
   enabled: true
