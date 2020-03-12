@@ -17,6 +17,8 @@ spec:
     metadata:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        sumologic.com/sourceCategory: 'vouch'
+        sumologic.com/sourceName: 'vouch'
       labels:
         app.kubernetes.io/name: {{ include "vouch.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
