@@ -1,6 +1,6 @@
 replicaCount: 1
 image:
-  repository: opengovorg/vouch-proxy
+  repository: voucher/vouch-proxy
   tag: "{{ .Chart.AppVersion }}"
   pullPolicy: IfNotPresent
 nameOverride: ""
@@ -16,3 +16,12 @@ resources: {}
   # requests:
   #   cpu: 200m
   #   memory: 256Mi
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
+  paths: ["/"]
+  hosts:
+    - vouch.mydomain.com

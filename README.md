@@ -30,6 +30,14 @@ helm repo list
     version: <app_version>
 ```
 
+OR:
+
+```
+  - name: <app_name>
+    repository: "https://raw.githubusercontent.com/opengov/helm-charts-external/master/"
+    version: <app_version>
+```
+
 ## References
 1. https://blog.softwaremill.com/hosting-helm-private-repository-from-github-ff3fa940d0b7
 2. https://medium.com/hackernoon/using-a-private-github-repo-as-helm-chart-repo-https-access-95629b2af27c
