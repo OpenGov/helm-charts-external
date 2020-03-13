@@ -17,21 +17,18 @@ spec:
     metadata:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        {{- range $key, $value := .Values.annotations.deployment }}
-          {{ $key }}: {{ $value | quote }}
-        {{- end }}
       labels:
         app.kubernetes.io/name: {{ include "vouch.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
-      {{- if .Values.annotations.pod }}
       template:
         metadata:
+          {{- if .Values.podAnnotations }}
           annotations:
-          {{- range $key, $value := .Values.annotations.pod }}
+          {{- range $key, $value := .Values.podAnnotations }}
             {{ $key }}: {{ $value | quote }}
           {{- end }}
-      {{- end }}
+          {{- end }}
       {{- if .Values.dnsConfig }}
       dnsConfig:
         {{- toYaml .Values.dnsConfig | nindent 8 }}

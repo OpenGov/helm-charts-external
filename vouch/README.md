@@ -3,7 +3,7 @@ Vouch Proxy
 An SSO and OAuth login solution for nginx using the auth_request module.
 
 [Vouch Proxy](https://github.com/vouch/vouch-proxy) supports many OAuth including Okta login providers and can enforce authentication.
-Current chart version is `0.1.3`.
+Current chart version is `0.1.4`.
 
 ## Chart Values
 

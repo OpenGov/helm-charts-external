@@ -16,12 +16,10 @@ resources: {}
   # requests:
   #   cpu: 200m
   #   memory: 256Mi
-annotations:
-  deployment:
-    desc: "this is for deployment"
-  pod:
+
+podAnnotations:
     desc: "this is for pod"
-      
+
 ingress:
   enabled: true
   annotations:
