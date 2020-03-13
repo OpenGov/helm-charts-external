@@ -3,10 +3,10 @@ entries:
   vouch:
   - apiVersion: v1
     appVersion: 0.6.19
-    created: 2020-03-11T17:21:43.893138951-07:00
+    created: 2020-03-13T16:57:22.144304161-07:00
     description: An SSO and OAuth login solution for nginx using the auth_request
       module
-    digest: 4b17ca8ece41b5917e969cc8934ba44ba229b832be9c69bb3cd8bf63251b88d7
+    digest: bb47a139db2acd3a28e48b8c43f9ee8c43eb28296a682510df556c2a70a79003
     icon: https://avatars0.githubusercontent.com/u/45102943?s=200&v=4
     maintainers:
     - email: helm@gavinmogan.com
@@ -17,4 +17,4 @@ entries:
     urls:
     - vouch-0.1.4.tgz
     version: 0.1.4
-generated: 2020-03-11T17:21:43.892310667-07:00
+generated: 2020-03-13T16:57:22.141915272-07:00
