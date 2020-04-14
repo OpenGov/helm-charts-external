@@ -17,4 +17,23 @@ entries:
     urls:
     - vouch-0.1.4.tgz
     version: 0.1.4
+  kube-janitor:
+  - apiVersion: v1
+    appVersion: v19.12.0
+    created: "2020-01-07T13:31:04.993386765+01:00"
+    description: Clean up (delete) Kubernetes resources after a configured TTL (time
+      to live)
+    digest: e2a0eeafb37b688d4a3d8b4f56268abf55edce6ffd36e87b957d64acb5fd5d27
+    home: https://github.com/hjacobs/kube-janitor
+    maintainers:
+    - email: henning@jacobs1.de
+      name: hjacobs
+    - email: me@mayppong.com
+      name: mayppong
+    name: kube-janitor
+    sources:
+    - https://github.com/hjacobs/kube-janitor
+    urls:
+    - kube-janitor-0.1.0.tgz
+    version: 0.1.0
 generated: 2020-03-13T16:57:22.141915272-07:00
