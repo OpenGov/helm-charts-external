@@ -3,7 +3,7 @@ entries:
   kube-janitor:
   - apiVersion: v1
     appVersion: v19.12.0
-    created: "2020-04-20T15:09:23.480730069-06:00"
+    created: "2020-04-29T13:35:37.603704-05:00"
     description: Clean up (delete) Kubernetes resources after a configured TTL (time
       to live)
     digest: a5bf89e6a7797274a0969c901e2e9b85f63f23d44b0d4eb6d803154ec091e095
@@ -19,10 +19,33 @@ entries:
     urls:
     - kube-janitor-0.1.0.tgz
     version: 0.1.0
+  nginx-ingress:
+  - appVersion: 0.21.0
+    created: "2020-04-29T13:35:37.605274-05:00"
+    description: An nginx Ingress controller that uses ConfigMap to store the nginx
+      configuration.
+    digest: 05459d2befc45bf6b997b07b647b3bfb4b142b88819142d9ef9b19c7d0aeed8f
+    engine: gotpl
+    home: https://github.com/kubernetes/ingress-nginx
+    icon: https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Nginx_logo.svg/500px-Nginx_logo.svg.png
+    keywords:
+    - ingress
+    - nginx
+    maintainers:
+    - email: jack.zampolin@gmail.com
+      name: jackzampolin
+    - email: mgoodness@gmail.com
+      name: mgoodness
+    name: nginx-ingress
+    sources:
+    - https://github.com/kubernetes/ingress-nginx
+    urls:
+    - nginx-ingress-1.1.5.tgz
+    version: 1.1.5
   vouch:
   - apiVersion: v1
     appVersion: 0.6.19
-    created: "2020-04-20T15:09:23.480975384-06:00"
+    created: "2020-04-29T13:35:37.605602-05:00"
     description: An SSO and OAuth login solution for nginx using the auth_request
       module
     digest: 7dd722c9ce6472b53c783a312e4c4adc47889bcdf59fcbe415d3abd0906b80d4
@@ -36,4 +59,4 @@ entries:
     urls:
     - vouch-0.1.4.tgz
     version: 0.1.4
-generated: "2020-04-20T15:09:23.479449744-06:00"
+generated: "2020-04-29T13:35:37.603192-05:00"
