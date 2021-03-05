@@ -44,8 +44,8 @@ entries:
     version: 1.1.5
   vouch:
   - apiVersion: v1
-    appVersion: 0.6.19
-    created: "2020-04-29T13:35:37.605602-05:00"
+    appVersion: 0.17.3
+    created: "2021-03-04T13:35:37.605602-05:00"
     description: An SSO and OAuth login solution for nginx using the auth_request
       module
     digest: 7dd722c9ce6472b53c783a312e4c4adc47889bcdf59fcbe415d3abd0906b80d4
@@ -57,6 +57,6 @@ entries:
     sources:
     - https://github.com/vouch/vouch-proxy/
     urls:
-    - vouch-0.1.4.tgz
-    version: 0.1.4
-generated: "2020-04-29T13:35:37.603192-05:00"
+    - vouch-1.0.0.tgz
+    version: 1.0.0
+generated: "2021-03-04T13:35:37.603192-05:00"

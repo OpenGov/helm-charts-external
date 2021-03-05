@@ -14,5 +14,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args:  ['{{ include "vouch.fullname" . }}:9090']
+      args:  ['{{ include "vouch.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never
