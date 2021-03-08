@@ -3,9 +3,8 @@ entries:
   kube-janitor:
   - apiVersion: v1
     appVersion: v19.12.0
-    created: "2020-04-29T13:35:37.603704-05:00"
-    description: Clean up (delete) Kubernetes resources after a configured TTL (time
-      to live)
+    created: "2021-03-08T15:47:26.402293983+05:30"
+    description: Clean up (delete) Kubernetes resources after a configured TTL (time to live)
     digest: a5bf89e6a7797274a0969c901e2e9b85f63f23d44b0d4eb6d803154ec091e095
     home: https://github.com/hjacobs/kube-janitor
     maintainers:
@@ -20,12 +19,11 @@ entries:
     - kube-janitor-0.1.0.tgz
     version: 0.1.0
   nginx-ingress:
-  - appVersion: 0.21.0
-    created: "2020-04-29T13:35:37.605274-05:00"
-    description: An nginx Ingress controller that uses ConfigMap to store the nginx
-      configuration.
-    digest: 05459d2befc45bf6b997b07b647b3bfb4b142b88819142d9ef9b19c7d0aeed8f
-    engine: gotpl
+  - apiVersion: v1
+    appVersion: 0.21.0
+    created: "2021-03-08T15:47:26.40356955+05:30"
+    description: An nginx Ingress controller that uses ConfigMap to store the nginx configuration.
+    digest: d57973482fb902cb3da817d3b93e25eee6af0f5d2aef98bc00746f0092b3f2d5
     home: https://github.com/kubernetes/ingress-nginx
     icon: https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Nginx_logo.svg/500px-Nginx_logo.svg.png
     keywords:
@@ -45,10 +43,9 @@ entries:
   vouch:
   - apiVersion: v1
     appVersion: 0.17.3
-    created: "2021-03-04T13:35:37.605602-05:00"
-    description: An SSO and OAuth login solution for nginx using the auth_request
-      module
-    digest: 7dd722c9ce6472b53c783a312e4c4adc47889bcdf59fcbe415d3abd0906b80d4
+    created: "2021-03-08T15:47:26.404210048+05:30"
+    description: An SSO and OAuth login solution for nginx using the auth_request module
+    digest: a37d89d7a0c243a05e2b531350486b00498aa690a578ef14d75394e4585108ef
     icon: https://avatars0.githubusercontent.com/u/45102943?s=200&v=4
     maintainers:
     - email: helm@gavinmogan.com
@@ -59,4 +56,4 @@ entries:
     urls:
     - vouch-1.0.0.tgz
     version: 1.0.0
-generated: "2021-03-04T13:35:37.603192-05:00"
+generated: "2021-03-08T15:47:26.401788899+05:30"
