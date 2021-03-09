@@ -3,7 +3,7 @@ entries:
   kube-janitor:
   - apiVersion: v1
     appVersion: v19.12.0
-    created: "2021-03-09T16:38:06.53725382+05:30"
+    created: "2021-03-09T16:39:23.084206147+05:30"
     description: Clean up (delete) Kubernetes resources after a configured TTL (time to live)
     digest: a5bf89e6a7797274a0969c901e2e9b85f63f23d44b0d4eb6d803154ec091e095
     home: https://github.com/hjacobs/kube-janitor
@@ -21,9 +21,9 @@ entries:
   nginx-ingress:
   - apiVersion: v1
     appVersion: 0.21.0
-    created: "2021-03-09T16:38:06.538960912+05:30"
+    created: "2021-03-09T16:39:23.086041663+05:30"
     description: An nginx Ingress controller that uses ConfigMap to store the nginx configuration.
-    digest: 5bf13cda93f0447096e6bfcd2651bc103cb999824270cd73031b050ac3440a5f
+    digest: 782baaca85505c1cd87f602864ebb706e4f49e4ea814c1017b249e4d68976a71
     home: https://github.com/kubernetes/ingress-nginx
     icon: https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Nginx_logo.svg/500px-Nginx_logo.svg.png
     keywords:
@@ -43,7 +43,7 @@ entries:
   vouch:
   - apiVersion: v1
     appVersion: 0.17.3
-    created: "2021-03-09T16:38:06.540004126+05:30"
+    created: "2021-03-09T16:39:23.086994019+05:30"
     description: An SSO and OAuth login solution for nginx using the auth_request module
     digest: a37d89d7a0c243a05e2b531350486b00498aa690a578ef14d75394e4585108ef
     icon: https://avatars0.githubusercontent.com/u/45102943?s=200&v=4
@@ -56,4 +56,4 @@ entries:
     urls:
     - vouch-1.0.0.tgz
     version: 1.0.0
-generated: "2021-03-09T16:38:06.536422364+05:30"
+generated: "2021-03-09T16:39:23.083478537+05:30"
