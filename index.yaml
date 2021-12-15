@@ -3,12 +3,12 @@ entries:
   jenkins:
   - apiVersion: v1
     appVersion: lts
-    created: "2021-10-13T16:26:40.712548592+05:30"
+    created: "2021-12-15T10:33:15.444332509+05:30"
     deprecated: true
     description: DEPRECATED - Open source continuous integration server. It supports
       multiple SCM tools including CVS, Subversion and Git. It can execute Apache
       Ant and Apache Maven-based projects as well as arbitrary scripts.
-    digest: 47c5bbdb779b3296e8e180c1f44fddf3c4f4084a01de4c1a458117a54f20f5a4
+    digest: d163b3ee5c8d834097aa23ab4aa5a5f46bd2987ca28173169d3025ebb286553f
     home: https://jenkins.io/
     icon: https://wiki.jenkins-ci.org/download/attachments/2916393/logo.png
     name: jenkins
@@ -23,7 +23,7 @@ entries:
   kube-janitor:
   - apiVersion: v1
     appVersion: v19.12.0
-    created: "2021-10-13T16:26:40.713329137+05:30"
+    created: "2021-12-15T10:33:15.44508443+05:30"
     description: Clean up (delete) Kubernetes resources after a configured TTL (time
       to live)
     digest: a5bf89e6a7797274a0969c901e2e9b85f63f23d44b0d4eb6d803154ec091e095
@@ -42,7 +42,7 @@ entries:
   nginx-ingress:
   - apiVersion: v1
     appVersion: 0.21.0
-    created: "2021-10-13T16:26:40.715853326+05:30"
+    created: "2021-12-15T10:33:15.448060682+05:30"
     description: An nginx Ingress controller that uses ConfigMap to store the nginx
       configuration.
     digest: 782baaca85505c1cd87f602864ebb706e4f49e4ea814c1017b249e4d68976a71
@@ -65,7 +65,7 @@ entries:
   vouch:
   - apiVersion: v1
     appVersion: 0.17.3
-    created: "2021-10-13T16:26:40.71715729+05:30"
+    created: "2021-12-15T10:33:15.44913181+05:30"
     description: An SSO and OAuth login solution for nginx using the auth_request
       module
     digest: a37d89d7a0c243a05e2b531350486b00498aa690a578ef14d75394e4585108ef
@@ -79,4 +79,4 @@ entries:
     urls:
     - vouch-1.0.0.tgz
     version: 1.0.0
-generated: "2021-10-13T16:26:40.706531728+05:30"
+generated: "2021-12-15T10:33:15.440264945+05:30"
