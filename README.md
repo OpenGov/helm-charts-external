@@ -1,43 +1,70 @@
 # External Helm Charts
 
-1. Create Personal Access token in Github and make sure it's SSO authorized in this [link](https://github.com/settings/tokens)
+## Usage with Helm
 
-2. Create tgz file with chart in current directory:
-```
-helm package <app-name> 
-```
+1. Add the repo to helm repo list:
 
-3. Create index.yaml file which references application:
-```
-helm repo index . 
+```bash
+helm repo add opengov-external 'https://opengov.github.io/helm-charts-external/'
 ```
 
-4. Add the repo to helm repo list:
-```
-helm repo add helm-charts-external 'https://raw.githubusercontent.com/OpenGov/helm-charts-external/master/'
-```
+1. Check if repo exists in helm repo list:
 
-5. Check if repo exists in helm repo list:
-```
+```bash
 helm repo update
 helm repo list
 ```
 
-6. In requirements file, can reference the application by adding as below:
-```
-  - name: <app_name>
-    repository: "alias:helm-external-repo"
-    version: <app_version>
+1. Use a chart
+
+```bash
+helm install opengov-external/$CHART $RELEASE_NAME --values $VALUES
 ```
 
-OR:
+## Usage with Kustomize
 
+In your `kustomize.yaml`:
+
+```yaml
+---
+helmCharts:
+- name: chart-name
+  repo: https://opengov.github.io/helm-charts-external
+  version: vX.Y.Z
+  releaseName: chart-name
+  namespace: chart-namespace
+  valuesFile: values.yaml
+  valuesInline:
+    image: "imagename:tag"
 ```
-  - name: <app_name>
-    repository: "https://raw.githubusercontent.com/opengov/helm-charts-external/master/"
-    version: <app_version>
+
+## Updating the Charts
+
+1. Fetch the chart version you want to update to
+
+```bash
+cd charts/
+helm fetch repo/chart --version X.Y.Z
+```
+
+1. Extract the chart
+
+```bash
+tar xjf chart-X.Y.Z.tgz
+```
+
+1. Commit changes and open a PR
+
+```bash
+git checkout -B ticket-123-update-chart
+git add chart/
+git commit
+git push ticket-123-update-chart
+gh pr create # or open in the GH UI
 ```
 
 ## References
+
 1. https://blog.softwaremill.com/hosting-helm-private-repository-from-github-ff3fa940d0b7
-2. https://medium.com/hackernoon/using-a-private-github-repo-as-helm-chart-repo-https-access-95629b2af27c
+1. https://medium.com/hackernoon/using-a-private-github-repo-as-helm-chart-repo-https-access-95629b2af27c
+1. https://medium.com/@mattiaperi/create-a-public-helm-chart-repository-with-github-pages-49b180dbb417
