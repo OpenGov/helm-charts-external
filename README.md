@@ -63,6 +63,10 @@ git push ticket-123-update-chart
 gh pr create # or open in the GH UI
 ```
 
+## Releasing the charts
+
+1. The GitHub Actions Workflow [.github/workflows/release_charts.yml](.github/workflows/release_charts.yml) will handle it on merge to `master`
+
 ## References
 
 1. https://blog.softwaremill.com/hosting-helm-private-repository-from-github-ff3fa940d0b7
