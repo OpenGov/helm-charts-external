@@ -40,4 +40,3 @@ rules:
   trailing-spaces: disable
   truthy:
     level: warning
-  validate-maintainers: disable
