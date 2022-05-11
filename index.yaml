@@ -72,6 +72,19 @@ entries:
     version: 0.1.0
   teleport-kube-agent:
   - apiVersion: v2
+    appVersion: 9.1.2
+    created: "2022-05-11T19:34:15.577222381Z"
+    description: Teleport provides a secure SSH and Kubernetes remote access solution
+      that doesn't get in the way.
+    digest: 7f56f6b3021a6b734a0dbd0b5da5b3ba29203a79f9ec2688ae12f4814ed40338
+    icon: https://goteleport.com/images/logos/logo-teleport-square.svg
+    keywords:
+    - Teleport
+    name: teleport-kube-agent
+    urls:
+    - https://github.com/OpenGov/helm-charts-external/releases/download/teleport-kube-agent-9.1.2/teleport-kube-agent-9.1.2.tgz
+    version: 9.1.2
+  - apiVersion: v2
     appVersion: 9.0.3
     created: "2022-04-06T23:46:41.685442155Z"
     description: Teleport provides a secure SSH and Kubernetes remote access solution
@@ -101,4 +114,4 @@ entries:
     urls:
     - https://github.com/OpenGov/helm-charts-external/releases/download/vouch-1.0.0/vouch-1.0.0.tgz
     version: 1.0.0
-generated: "2022-04-06T23:46:41.808902641Z"
+generated: "2022-05-11T19:34:15.577230881Z"
