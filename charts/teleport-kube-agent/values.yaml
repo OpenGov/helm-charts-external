@@ -1,3 +1,4 @@
+---
 ################################################################
 # Values that must always be provided by the user.
 ################################################################
@@ -5,18 +6,18 @@
 # Join token for the cluster.
 # Leave empty if the secret "teleport-kube-agent-join-token"
 # has been created before and contains a valid join token
-authToken: ""
+authToken: ''
 # Address of the teleport proxy with port (usually :3080).
-proxyAddr: ""
+proxyAddr: ''
 # Comma-separated list of roles to enable (any of: kube,db,app)
-roles: "kube"
+roles: kube
 
 ################################################################
 # Values that must be provided if Kubernetes access is enabled.
 ################################################################
 
 # Name for this kubernetes cluster to be used by teleport users.
-kubeClusterName: ""
+kubeClusterName: ''
 
 ################################################################
 # Values that must be provided if Application access is enabled.
@@ -75,7 +76,7 @@ databaseResources: []
 ################################################################
 
 # Version of teleport image, if different from appVersion in Chart.yaml.
-teleportVersionOverride: ""
+teleportVersionOverride: ''
 
 # Optional CA pins of the auth server. This enables a more secure way of
 # adding new nodes to a cluster. See "Adding Nodes to the Cluster"
@@ -97,12 +98,12 @@ tls:
   # This will automatically set the SSL_CERT_FILE environment variable to trust the CA.
   # Create the secret with `kubectl create secret generic --from-file=ca.pem=/path/to/root-ca.pem`
   # The filename inside the secret is important - it _must_ be ca.pem
-  existingCASecretName: ""
+  existingCASecretName: ''
 
 # If set, will use an existing volume mounted via extraVolumes
 # as the Teleport data directory.
 # If anything is set under the "storage" key, this will be ignored.
-existingDataVolume: ""
+existingDataVolume: ''
 
 # If true, create & use Pod Security Policy resources
 # https://kubernetes.io/docs/concepts/policy/pod-security-policy/
@@ -144,7 +145,7 @@ highAvailability:
 ################################################################
 storage:
   enabled: false
-  storageClassName: ""
+  storageClassName: ''
   requests: 128Mi
 
 ################################################################
@@ -161,11 +162,11 @@ imagePullSecrets: []
 # DEPRECATED Use highAvailability:replicaCount instead
 # replicaCount: 1
 # (optional) Override the name of the ClusterRole used by the agent's service account.
-clusterRoleName: ""
+clusterRoleName: ''
 # (optional) Override the name of the ClusterRoleBinding used by the agent's service account.
-clusterRoleBindingName: ""
+clusterRoleBindingName: ''
 # (optional) Override the name of the service account used by the agent.
-serviceAccountName: ""
+serviceAccountName: ''
 # Name of the Secret to store the teleport join token.
 secretName: teleport-kube-agent-join-token
 
@@ -185,10 +186,10 @@ log:
   format: text
   # Possible extra_fields values include: timestamp, component, caller, and level.
   # All extra fields are included by default.
-  extraFields: ["timestamp", "level", "component", "caller"]
+  extraFields: [timestamp, level, component, caller]
 
 ##################################
-# Extra Kubernetes configuration #
+# Extra Kubernetes configuration  #
 ##################################
 
 # Affinity for pod assignment
@@ -269,7 +270,7 @@ resources: {}
 #    memory: "2Gi"
 
 # Priority class name to add to the deployment
-priorityClassName: ""
+priorityClassName: ''
 
 # Tolerations for pod assignment
 # https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
