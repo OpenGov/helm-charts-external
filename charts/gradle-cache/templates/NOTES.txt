@@ -1,0 +1,3 @@
+{{- if .Values.enabled }}
+Gradle cache is available at http://{{template "gradle-cache.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local/cache/
+{{- end }}

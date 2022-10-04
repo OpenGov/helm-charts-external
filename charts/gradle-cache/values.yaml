@@ -1,0 +1,53 @@
+affinity: {}
+
+annotations:
+  sumologic.com/sourceCategory: gradle-cache
+  sumologic.com/sourceName: gradle-cache
+  sumologic.com/format: text
+
+enabled: true
+
+image:
+  pullPolicy: IfNotPresent
+  repository: gradle/build-cache-node
+
+internalPort: 5071
+
+livenessProbe:
+  enabled: false
+  failureThreshold: 2
+  initialDelaySeconds: 20
+  periodSeconds: 30
+  successThreshold: 1
+  timeoutSeconds: 5
+
+name: gradle
+
+nodeSelector: {}
+
+persistence:
+  accessMode: ReadWriteOnce
+  enabled: true
+  mountPath: /data
+  size: 1Gi
+  storageClass: gp2-encrypted
+
+readinessProbe:
+  enabled: false
+  failureThreshold: 2
+  initialDelaySeconds: 20
+  periodSeconds: 30
+  successThreshold: 1
+  timeoutSeconds: 5
+
+resources:
+  requests:
+    memory: "2Gi"
+    cpu: "500m"
+  limits:
+    memory: "2Gi"
+    cpu: "500m"
+
+service:
+  port: 80
+  type: ClusterIP

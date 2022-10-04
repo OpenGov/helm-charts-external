@@ -1,0 +1,105 @@
+{{- if .Values.enabled -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "gradle-cache.fullname" . }}
+  labels:
+    app: {{ template "gradle-cache.name" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    component: "{{ .Release.Name }}-{{ .Values.name }}"
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  serviceName: {{ template "gradle-cache.name" . }}
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: {{ template "gradle-cache.name" . }}
+      chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+      component: "{{ .Release.Name }}-{{ .Values.name }}"
+      release: {{ .Release.Name }}
+      role: {{ template "gradle-cache.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "gradle-cache.name" . }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        component: "{{ .Release.Name }}-{{ .Values.name }}"
+        release: {{ .Release.Name }}
+        role: {{ template "gradle-cache.name" . }}
+      annotations:
+      {{- range $key, $value := .Values.annotations }}
+        {{ $key }}: {{ $value | quote }}
+      {{- end }}
+    spec:
+      containers:
+      - name: {{ .Values.name }}
+        image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.version }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        securityContext:
+          allowPrivilegeEscalation: false
+        ports:
+        - containerPort: {{ .Values.internalPort }}
+      {{- if .Values.persistence.enabled }}
+        volumeMounts:
+        - name: gradle-cache-volume
+          mountPath: {{ .Values.persistence.mountPath | quote }}
+      {{- end }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+        {{- if .Values.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: '/'
+            port: {{ .Values.internalPort }}
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          successThreshold: {{ .Values.readinessProbe.successThreshold }}
+        {{- end }}
+        {{- if .Values.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: '/'
+            port: {{ .Values.internalPort }}
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          successThreshold: {{ .Values.livenessProbe.successThreshold }}
+        {{- end }}
+ {{- if .Values.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: gradle-cache-volume
+    spec:
+    {{- if .Values.persistence.existingClaim }}
+      selector:
+        matchLabels:
+          app: {{ template "gradle-cache.name" . }}
+    {{- else }}
+      {{- if .Values.persistence.storageClass }}
+      storageClassName: "{{ .Values.persistence.storageClass }}"
+      {{- end }}
+      accessModes: [ "{{ .Values.persistence.accessMode }}" ]
+      resources:
+        requests:
+          storage: {{ .Values.persistence.size }}
+    {{- end }}
+ {{- end }}
+{{- end }}
