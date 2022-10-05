@@ -1,5 +1,15 @@
 apiVersion: v1
 entries:
+  gradle-cache:
+  - apiVersion: v1
+    appVersion: "11.0"
+    created: "2022-10-05T00:09:45.899325685Z"
+    description: A Helm chart for Gradle Cache
+    digest: 1a46b2f1c8f90c0820c89a75b30342c09a1eacce6fd237e935336287c879f208
+    name: gradle-cache
+    urls:
+    - https://github.com/OpenGov/helm-charts-external/releases/download/gradle-cache-0.2.0/gradle-cache-0.2.0.tgz
+    version: 0.2.0
   ingress-nginx:
   - annotations:
       artifacthub.io/changes: |
@@ -140,4 +150,4 @@ entries:
     urls:
     - https://github.com/OpenGov/helm-charts-external/releases/download/vouch-1.0.0/vouch-1.0.0.tgz
     version: 1.0.0
-generated: "2022-08-24T19:39:57.770055757Z"
+generated: "2022-10-05T00:09:45.899340485Z"
