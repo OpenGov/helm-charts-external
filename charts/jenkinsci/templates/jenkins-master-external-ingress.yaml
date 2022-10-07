@@ -1,0 +1,45 @@
+{{- if .Values.jenkins.master.CustomIngressHostName }}
+{{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: {{ .Values.jenkins.master.ingress.apiVersion }}
+{{- else -}}
+apiVersion: {{ .Values.master.ingress.apiVersion }}
+{{- end }}
+kind: Ingress
+metadata:
+{{- if .Values.jenkins.master.ingress.annotations }}
+  annotations:
+{{ toYaml .Values.jenkins.master.ingress.annotations | indent 4 }}
+{{- end }}
+  name: {{ template "jenkins.fullname" . }}
+  labels:
+    app: {{ template "jenkins.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  rules:
+  - host: {{ .Values.jenkins.master.CustomIngressHostName | quote }}
+    http:
+      paths:
+      - path: '/jenkins/github-webhook'
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: {{ template "jenkins.fullname" . }}
+            port:
+              number: {{ .Values.jenkins.master.servicePort }}
+      - path: '/jenkins/bitbucket-hook'
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: {{ template "jenkins.fullname" . }}
+            port:
+              number: {{ .Values.jenkins.master.servicePort }}
+      - path: '/jenkins/generic-webhook-trigger/invoke'
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: {{ template "jenkins.fullname" . }}
+            port:
+              number: {{ .Values.jenkins.master.servicePort }}
+{{- end }}

@@ -1,0 +1,26 @@
+{{- if .Values.jenkins.persistence.enabled -}}
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: {{ .Values.jenkins.persistence.existingClaim }}
+  labels:
+    app: {{ template "jenkins.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+{{- if .Values.jenkins.persistence.storageClass }}
+{{- if (eq "-" .Values.jenkins.persistence.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.jenkins.persistence.storageClass }}"
+{{- end }}
+{{- end }}
+  capacity:
+    storage: {{ .Values.jenkins.persistence.size | quote }}
+  accessModes:
+  - {{ .Values.jenkins.persistence.accessMode | quote }}
+  awsElasticBlockStore:
+    volumeID: "{{ .Values.jenkins.persistence.VolumeId }}"
+    fsType: "{{ .Values.jenkins.persistence.FsType }}"
+{{- end }}

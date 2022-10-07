@@ -1,0 +1,12 @@
+dependencies:
+- name: jenkins
+  repository: https://opengov.github.io/helm-charts-external/
+  version: 2.5.4
+- name: gradle-cache
+  repository: file://../gradle-cache
+  version: 0.2.0
+- name: spotify-docker-gc
+  repository: https://charts.helm.sh/stable
+  version: 1.0.2
+digest: sha256:7b1c6e26c6b515d5277920b63bce516eed163e57450a28ddf617e72191357a8a
+generated: "2022-05-05T08:22:22.576368-07:00"

@@ -1,0 +1,31 @@
+{{- if .Values.jenkins.master.CustomInternalIngressHostName }}
+{{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: {{ .Values.jenkins.master.ingress.apiVersion }}
+{{- else -}}
+apiVersion: {{ .Values.master.ingress.apiVersion }}
+{{- end }}
+kind: Ingress
+metadata:
+{{- if .Values.jenkins.master.internalIngress.annotations }}
+  annotations:
+{{ toYaml .Values.jenkins.master.internalIngress.annotations | indent 4 }}
+{{- end }}
+  name: {{ template "jenkins.fullname" . }}-internal
+  labels:
+    app: {{ template "jenkins.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  rules:
+  - host: {{ .Values.jenkins.master.CustomInternalIngressHostName | quote }}
+    http:
+      paths:
+      - path: '/jenkins'
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: {{ template "jenkins.fullname" . }}
+            port:
+              number: {{ .Values.jenkins.master.servicePort }}
+{{- end }}

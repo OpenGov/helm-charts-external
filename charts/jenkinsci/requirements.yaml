@@ -1,0 +1,14 @@
+dependencies:
+  - name: jenkins
+    repository: https://charts.jenkins.io 
+    version: 2.5.4
+
+  # Gradle-cache
+  - name: gradle-cache
+    alias: gradle
+    version: 0.2.0
+    repository: file://../gradle-cache
+
+  - name: spotify-docker-gc
+    version: 1.0.2
+    repository: https://charts.helm.sh/stable

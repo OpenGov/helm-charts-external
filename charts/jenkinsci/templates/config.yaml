@@ -1,0 +1,522 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "jenkins.fullname" . }}
+data:
+  config.xml: |-
+    <?xml version='1.0' encoding='UTF-8'?>
+    <hudson>
+      <disabledAdministrativeMonitors/>
+
+      <!-- The version of Jenkins-->
+      <version>{{ .Values.jenkins.master.imageTag }}</version>
+
+      <!-- The number of executors for the Jenkins master -->
+      <numExecutors>{{ .Values.masterExecutorCount }}</numExecutors>
+      <mode>NORMAL</mode>
+
+      <!-- Whether authentication should be enforced -->
+      <useSecurity>{{ .Values.jenkins.master.useSecurity }}</useSecurity>
+      <!-- Authorization & Security -->
+{{- if .Values.okta.enabled }}
+      <authorizationStrategy class="hudson.security.GlobalMatrixAuthorizationStrategy">
+            <permission>GROUP:com.cloudbees.plugins.credentials.CredentialsProvider.Create:authenticated</permission>
+            <permission>GROUP:com.cloudbees.plugins.credentials.CredentialsProvider.Delete:authenticated</permission>
+            <permission>GROUP:com.cloudbees.plugins.credentials.CredentialsProvider.ManageDomains:authenticated</permission>
+            <permission>GROUP:com.cloudbees.plugins.credentials.CredentialsProvider.Update:authenticated</permission>
+            <permission>GROUP:com.cloudbees.plugins.credentials.CredentialsProvider.View:authenticated</permission>
+            <permission>GROUP:hudson.model.Computer.Build:authenticated</permission>
+            <permission>GROUP:hudson.model.Computer.Configure:authenticated</permission>
+            <permission>GROUP:hudson.model.Computer.Connect:authenticated</permission>
+            <permission>GROUP:hudson.model.Computer.Create:authenticated</permission>
+            <permission>GROUP:hudson.model.Computer.Disconnect:authenticated</permission>
+            <permission>GROUP:hudson.model.Computer.ExtendedRead:authenticated</permission>
+            <permission>GROUP:hudson.model.Hudson.Read:authenticated</permission>
+            <permission>GROUP:hudson.model.Hudson.SystemRead:authenticated</permission>
+            <permission>GROUP:hudson.model.Item.Build:authenticated</permission>
+            <permission>GROUP:hudson.model.Item.Cancel:authenticated</permission>
+            <permission>GROUP:hudson.model.Item.Configure:authenticated</permission>
+            <permission>GROUP:hudson.model.Item.Create:authenticated</permission>
+            <permission>GROUP:hudson.model.Item.Delete:authenticated</permission>
+            <permission>GROUP:hudson.model.Item.Discover:authenticated</permission>
+            <permission>GROUP:hudson.model.Item.ExtendedRead:authenticated</permission>
+            <permission>GROUP:hudson.model.Item.Move:authenticated</permission>
+            <permission>GROUP:hudson.model.Item.Read:authenticated</permission>
+            <permission>GROUP:hudson.model.Item.Workspace:authenticated</permission>
+            <permission>GROUP:hudson.model.Run.Delete:authenticated</permission>
+            <permission>GROUP:hudson.model.Run.Replay:authenticated</permission>
+            <permission>GROUP:hudson.model.Run.Update:authenticated</permission>
+            <permission>GROUP:hudson.model.View.Configure:authenticated</permission>
+            <permission>GROUP:hudson.model.View.Create:authenticated</permission>
+            <permission>GROUP:hudson.model.View.Delete:authenticated</permission>
+            <permission>GROUP:hudson.model.View.Read:authenticated</permission>
+            <permission>GROUP:hudson.plugins.jobConfigHistory.JobConfigHistory.DeleteEntry:authenticated</permission>
+            <permission>GROUP:hudson.scm.SCM.Tag:authenticated</permission>
+            <permission>GROUP:org.jenkins.plugins.lockableresources.LockableResourcesManager.Reserve:authenticated</permission>
+            <permission>GROUP:org.jenkins.plugins.lockableresources.LockableResourcesManager.Unlock:authenticated</permission>
+            <permission>GROUP:org.jenkins.plugins.lockableresources.LockableResourcesManager.View:authenticated</permission>
+            <permission>GROUP:org.jfrog.hudson.ArtifactoryPlugin.Promote:authenticated</permission>
+            <permission>GROUP:org.jfrog.hudson.ArtifactoryPlugin.Release:authenticated</permission>
+            {{- range $index, $val := .Values.jenkins.master.admins }}
+            <permission>USER:hudson.model.Hudson.Administer:{{$val}}</permission>
+            {{- end }}
+      </authorizationStrategy>
+      <securityRealm class="org.jenkinsci.plugins.saml.SamlSecurityRealm" plugin="saml@1.0.5">
+        <displayNameAttributeName>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name</displayNameAttributeName>
+        <groupsAttributeName>http://schemas.xmlsoap.org/claims/Group</groupsAttributeName>
+        <maximumAuthenticationLifetime>86400</maximumAuthenticationLifetime>
+        <usernameCaseConversion>none</usernameCaseConversion>
+        <usernameAttributeName>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name</usernameAttributeName>
+        <logoutUrl>https://opengov.okta.com</logoutUrl>
+        <binding>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</binding>
+        <idpMetadataConfiguration>
+          {{ .Values.okta.idpMetadata | indent 4 }}
+          <url>{{ .Values.okta.idpIssuer }}</url>
+          <period>0</period>
+        </idpMetadataConfiguration>
+      </securityRealm>
+{{- else }}
+      <securityRealm class="hudson.security.LegacySecurityRealm"/>
+{{- end }}
+      <disableRememberMe>false</disableRememberMe>
+      <projectNamingStrategy class="jenkins.model.ProjectNamingStrategy$DefaultProjectNamingStrategy"/>
+      <workspaceDir>${JENKINS_HOME}/workspace/${ITEM_FULLNAME}</workspaceDir>
+      <buildsDir>${ITEM_ROOTDIR}/builds</buildsDir>
+      <markupFormatter class="hudson.markup.EscapedMarkupFormatter"/>
+      <jdks/>
+      <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>
+      <myViewsTabBar class="hudson.views.DefaultMyViewsTabBar"/>
+
+      <!-- Kubernetes plugin settings -->
+      <clouds>
+        <org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud plugin="kubernetes@{{ template "jenkinsci.kubernetes-version" . }}">
+          <name>kubernetes</name>
+          <defaultsProviderTemplate>{{ .Values.jenkins.master.slaveDefaultsProviderTemplate }}</defaultsProviderTemplate>
+          <templates>
+{{- if .Values.jenkins.agent.enabled }}
+            <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+              <inheritFrom></inheritFrom>
+              <name>default</name>
+              <instanceCap>2147483647</instanceCap>
+              <idleMinutes>0</idleMinutes>
+              <label>{{ .Release.Name }}-{{ .Values.jenkins.agent.componentName }}</label>
+              <nodeSelector>
+                {{- $local := dict "first" true }}
+                {{- range $key, $value := .Values.jenkins.agent.NodeSelector }}
+                  {{- if not $local.first }},{{- end }}
+                  {{- $key }}={{ $value }}
+                  {{- $_ := set $local "first" false }}
+                {{- end }}</nodeSelector>
+                <nodeUsageMode>NORMAL</nodeUsageMode>
+              <volumes>
+{{- range $index, $volume := .Values.jenkins.agent.volumes }}
+                <org.csanchez.jenkins.plugins.kubernetes.volumes.{{ $volume.type }}Volume>
+{{- range $key, $value := $volume }}{{- if not (eq $key "type") }}
+                  <{{ $key }}>{{ $value }}</{{ $key }}>
+{{- end }}{{- end }}
+                </org.csanchez.jenkins.plugins.kubernetes.volumes.{{ $volume.type }}Volume>
+{{- end }}
+              </volumes>
+              <containers>
+                <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+                  <name>jnlp</name>
+                  <image>{{ .Values.jenkins.agent.image }}:{{ .Values.jenkins.agent.imageTag }}</image>
+{{- if .Values.jenkins.agent.privileged }}
+                  <privileged>true</privileged>
+{{- else }}
+                  <privileged>false</privileged>
+{{- end }}
+                  <alwaysPullImage>{{ .Values.jenkins.agent.alwaysPullImage }}</alwaysPullImage>
+                  <workingDir>/home/jenkins</workingDir>
+                  <command></command>
+                  <args>${computer.jnlpmac} ${computer.name}</args>
+                  <ttyEnabled>false</ttyEnabled>
+                  <resourceRequestCpu>{{.Values.jenkins.agent.resources.requests.cpu}}</resourceRequestCpu>
+                  <resourceRequestMemory>{{.Values.jenkins.agent.resources.requests.memory}}</resourceRequestMemory>
+                  <resourceLimitCpu>{{.Values.jenkins.agent.resources.limits.cpu}}</resourceLimitCpu>
+                  <resourceLimitMemory>{{.Values.jenkins.agent.resources.limits.memory}}</resourceLimitMemory>
+                  <envVars>
+                    <org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+                      <key>JENKINS_URL</key>
+                      <value>http://{{ template "jenkins.fullname" . }}:{{.Values.jenkins.master.servicePort}}{{ default "" .Values.jenkins.master.jenkinsUriPrefix }}</value>
+                    </org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+                  </envVars>
+                </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+              </containers>
+              <envVars/>
+              <annotations/>
+{{- if .Values.jenkins.agent.imagePullSecret }}
+              <imagePullSecrets>
+                <org.csanchez.jenkins.plugins.kubernetes.PodImagePullSecret>
+                  <name>{{ .Values.jenkins.agent.imagePullSecret }}</name>
+                </org.csanchez.jenkins.plugins.kubernetes.PodImagePullSecret>
+              </imagePullSecrets>
+{{- else }}
+              <imagePullSecrets/>
+{{- end }}
+              <nodeProperties/>
+            </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+              <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+              <inheritFrom></inheritFrom>
+              <name>agent-default</name>
+              <instanceCap>2147483647</instanceCap>
+              <idleMinutes>0</idleMinutes>
+              <label>jenkins</label>
+              <nodeSelector>
+                {{- $local := dict "first" true }}
+                {{- range $key, $value := .Values.jenkins.agent.NodeSelector }}
+                  {{- if not $local.first }},{{- end }}
+                  {{- $key }}={{ $value }}
+                  {{- $_ := set $local "first" false }}
+                {{- end }}</nodeSelector>
+                <nodeUsageMode>NORMAL</nodeUsageMode>
+              <volumes>
+{{- range $index, $volume := .Values.jenkins.agent.volumes }}
+                <org.csanchez.jenkins.plugins.kubernetes.volumes.{{ $volume.type }}Volume>
+{{- range $key, $value := $volume }}{{- if not (eq $key "type") }}
+                  <{{ $key }}>{{ $value }}</{{ $key }}>
+{{- end }}{{- end }}
+                </org.csanchez.jenkins.plugins.kubernetes.volumes.{{ $volume.type }}Volume>
+{{- end }}
+              </volumes>
+              <containers>
+                <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+                  <name>default-jnlp</name>
+                  <image>jenkins/inbound-agent</image>
+{{- if .Values.jenkins.agent.privileged }}
+                  <privileged>true</privileged>
+{{- else }}
+                  <privileged>false</privileged>
+{{- end }}
+                  <alwaysPullImage></alwaysPullImage>
+                  <workingDir>/home/jenkins/agent</workingDir>
+                  <command>cat</command>
+                  <args></args>
+                  <ttyEnabled>true</ttyEnabled>
+                  <resourceRequestCpu>0.5</resourceRequestCpu>
+                  <resourceRequestMemory>512Mi</resourceRequestMemory>
+                  <resourceLimitCpu>0.5</resourceLimitCpu>
+                  <resourceLimitMemory>512Mi</resourceLimitMemory>
+                  <envVars>
+                    <org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+                      <key>JENKINS_URL</key>
+                      <value>http://{{ template "jenkins.fullname" . }}:{{.Values.jenkins.master.servicePort}}{{ default "" .Values.jenkins.master.jenkinsUriPrefix }}</value>
+                    </org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+                  </envVars>
+                </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+              </containers>
+              <envVars/>
+              <annotations/>
+{{- if .Values.jenkins.agent.imagePullSecret }}
+              <imagePullSecrets>
+                <org.csanchez.jenkins.plugins.kubernetes.PodImagePullSecret>
+                  <name>{{ .Values.jenkins.agent.imagePullSecret }}</name>
+                </org.csanchez.jenkins.plugins.kubernetes.PodImagePullSecret>
+              </imagePullSecrets>
+{{- else }}
+              <imagePullSecrets/>
+{{- end }}
+              <nodeProperties/>
+            </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+{{- end -}}
+          </templates>
+          <serverUrl>https://kubernetes.default</serverUrl>
+          <skipTlsVerify>false</skipTlsVerify>
+          <namespace>{{ .Release.Namespace }}</namespace>
+          <jenkinsUrl>http://{{ template "jenkins.fullname" . }}:{{.Values.jenkins.master.servicePort}}{{ default "" .Values.jenkins.master.jenkinsUriPrefix }}</jenkinsUrl>
+          <jenkinsTunnel>{{ template "jenkins.fullname" . }}-agent:50000</jenkinsTunnel>
+          <containerCap>100</containerCap>
+          <retentionTimeout>5</retentionTimeout>
+          <connectTimeout>0</connectTimeout>
+          <readTimeout>0</readTimeout>
+          <maxRequestsPerHost>64</maxRequestsPerHost>
+        </org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud>
+      </clouds>
+      <quietPeriod>5</quietPeriod>
+      <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
+      <views>
+        <hudson.model.AllView>
+          <owner class="hudson" reference="../../.."/>
+          <name>All</name>
+          <filterExecutors>false</filterExecutors>
+          <filterQueue>false</filterQueue>
+          <properties class="hudson.model.View$PropertyList"/>
+        </hudson.model.AllView>
+      </views>
+      <primaryView>All</primaryView>
+      <slaveAgentPort>50000</slaveAgentPort>
+      <disabledAgentProtocols>
+{{- range .Values.jenkins.master.disabledAgentProtocols }}
+        <string>{{ . }}</string>
+{{- end }}
+      </disabledAgentProtocols>
+      <label></label>
+      <nodeProperties/>
+
+      <!-- Global environment variables to set for the builds -->
+      <globalNodeProperties>
+        <hudson.slaves.EnvironmentVariablesNodeProperty>
+          <envVars serialization="custom">
+            <unserializable-parents/>
+            <tree-map>
+              <default>
+                <comparator class="hudson.util.CaseInsensitiveComparator"/>
+              </default>
+              <int>7</int>
+              <!-- Internal Docker Registry Creds ID -->
+              <string>INTERNAL_REGISTRY_CREDENTIALS_ID</string>
+              <string>{{ .Values.docker.internal.credsId }}</string>
+
+              <!-- Internal Docker Registry Base Hostname-->
+              <string>INTERNAL_REGISTRY_HOSTNAME_BASE</string>
+              <string>{{ .Values.docker.internal.baseHostname }}</string>
+
+              <!-- Internal Docker Registry Hostname -->
+              <string>INTERNAL_REGISTRY_HOSTNAME</string>
+              <string>{{ .Values.docker.internal.hostname }}</string>
+
+              <!-- Internal Maven Registry -->
+              <string>INTERNAL_MAVEN_URL</string>
+              <string>{{ .Values.maven.internal.url }}</string>
+
+              <!-- Internal Maven Creds ID -->
+              <string>INTERNAL_MAVEN_CREDENTIALS_ID</string>
+              <string>{{ .Values.maven.internal.credsId }}</string>
+
+              <!-- Gradle Cache Server URL -->
+              <string>GRADLE_CACHE_URL</string>
+              <string>http://{{template "gradle.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local/cache/</string>
+
+              <!-- Flag to indicate that this is a CI env -->
+              <string>CI</string>
+              <string>true</string>
+            </tree-map>
+          </envVars>
+        </hudson.slaves.EnvironmentVariablesNodeProperty>
+      </globalNodeProperties>
+      <noUsageStatistics>true</noUsageStatistics>
+    </hudson>
+
+{{- if .Values.okta.enabled }}
+  saml-idp-metadata.xml: |-
+{{ .Values.okta.idpMetadata | indent 4 }}
+{{- end }}
+
+{{- if .Values.jenkins.master.scriptApproval }}
+  scriptapproval.xml: |-
+    <?xml version='1.0' encoding='UTF-8'?>
+    <scriptApproval plugin="script-security@1.27">
+      <approvedScriptHashes/>
+      <approvedSignatures>
+{{- range $key, $val := .Values.jenkins.master.scriptApproval }}
+        <string>{{ $val }}</string>
+{{- end }}
+      </approvedSignatures>
+      <aclApprovedSignatures/>
+      <approvedClasspathEntries/>
+      <pendingScripts/>
+      <pendingSignatures/>
+      <pendingClasspathEntries/>
+    </scriptApproval>
+{{- end }}
+
+  # Sets the Jenkins URL location
+  jenkins.model.JenkinsLocationConfiguration.xml: |-
+    <?xml version='1.0' encoding='UTF-8'?>
+    <jenkins.model.JenkinsLocationConfiguration>
+      <adminAddress>engops@opengov.com</adminAddress>
+{{- if eq .Values.jenkins.master.serviceType "NodePort" }} # if running on minikube
+      <jenkinsUrl>{{ .Values.okta.localHostName }}:{{ .Values.jenkins.master.NodePort }}/</jenkinsUrl>
+{{- else }}
+      <jenkinsUrl>https://{{ .Values.jenkins.master.CustomInternalIngressHostName }}/jenkins</jenkinsUrl>
+{{- end }}
+    </jenkins.model.JenkinsLocationConfiguration>
+
+  # For setting up the GitHub webhooks for triggering builds on pull requests
+  github-plugin-configuration.xml: |-
+    <?xml version='1.0' encoding='UTF-8'?>
+    <github-plugin-configuration plugin="github@{{ template "jenkinsci.github-version" . }}">
+      <configs>
+        <github-server-config>
+          <name>github</name>
+          <apiUrl>https://api.github.com</apiUrl>
+          <manageHooks>true</manageHooks>
+          <credentialsId>github-secrettext</credentialsId>
+          <clientCacheSize>20</clientCacheSize>
+        </github-server-config>
+      </configs>
+      <hookSecretConfig>
+        <credentialsId></credentialsId>
+      </hookSecretConfig>
+    </github-plugin-configuration>
+
+  # For setting up CI Lib
+  org.jenkinsci.plugins.workflow.libs.GlobalLibraries.xml: |-
+    <org.jenkinsci.plugins.workflow.libs.GlobalLibraries plugin="workflow-cps-global-lib@2.15">
+      <libraries>
+        <org.jenkinsci.plugins.workflow.libs.LibraryConfiguration>
+          <name>OGJenkinsLib</name>
+          <retriever class="org.jenkinsci.plugins.workflow.libs.SCMSourceRetriever">
+            <scm class="org.jenkinsci.plugins.github_branch_source.GitHubSCMSource" plugin="github-branch-source@2.5.6">
+              <id>249c5725-18bc-4e55-818f-e3a1e2c15cc4</id>
+              <credentialsId>github</credentialsId>
+              <repoOwner>OpenGov</repoOwner>
+              <repository>OGJenkinsLib</repository>
+              <traits>
+                <org.jenkinsci.plugins.github__branch__source.BranchDiscoveryTrait>
+                  <strategyId>1</strategyId>
+                </org.jenkinsci.plugins.github__branch__source.BranchDiscoveryTrait>
+                <org.jenkinsci.plugins.github__branch__source.OriginPullRequestDiscoveryTrait>
+                  <strategyId>1</strategyId>
+                </org.jenkinsci.plugins.github__branch__source.OriginPullRequestDiscoveryTrait>
+                <org.jenkinsci.plugins.github__branch__source.ForkPullRequestDiscoveryTrait>
+                  <strategyId>1</strategyId>
+                  <trust class="org.jenkinsci.plugins.github_branch_source.ForkPullRequestDiscoveryTrait$TrustPermission"/>
+                </org.jenkinsci.plugins.github__branch__source.ForkPullRequestDiscoveryTrait>
+              </traits>
+            </scm>
+          </retriever>
+          <defaultVersion>{{ .Values.jenkins.master.GlobalLibraries.OGJenkinsLib.defaultVersion }}</defaultVersion>
+          <implicit>false</implicit>
+          <allowVersionOverride>true</allowVersionOverride>
+          <includeInChangesets>true</includeInChangesets>
+        </org.jenkinsci.plugins.workflow.libs.LibraryConfiguration>
+        <org.jenkinsci.plugins.workflow.libs.LibraryConfiguration>
+          <name>Isodoro</name>
+          <retriever class="org.jenkinsci.plugins.workflow.libs.SCMSourceRetriever">
+            <scm class="jenkins.plugins.git.GitSCMSource" plugin="git@3.12.0">
+              <id>194c4cca-fe3a-4358-8bd8-a8f40e5ee77f</id>
+              <remote>git@github.com:OpenGov/Isodoro.git</remote>
+              <credentialsId>github-ssh</credentialsId>
+              <traits>
+                <jenkins.plugins.git.traits.BranchDiscoveryTrait/>
+                <jenkins.plugins.git.traits.TagDiscoveryTrait/>
+              </traits>
+            </scm>
+          </retriever>
+          <defaultVersion>{{ .Values.jenkins.master.GlobalLibraries.Isodoro.defaultVersion }}</defaultVersion>
+          <implicit>false</implicit>
+          <allowVersionOverride>true</allowVersionOverride>
+          <includeInChangesets>false</includeInChangesets>
+        </org.jenkinsci.plugins.workflow.libs.LibraryConfiguration>
+      </libraries>
+
+  # datadog plugin
+  org.datadog.jenkins.plugins.datadog.DatadogBuildListener.xml: |-
+    <org.datadog.jenkins.plugins.datadog.DatadogBuildListener_-DescriptorImpl plugin="datadog@0.6.2">
+      <apiKey>{{ .Values.secrets.secretTextType.datadog }}</apiKey>
+      <hostname></hostname>
+      <blacklist></blacklist>
+      <whitelist></whitelist>
+      <tagNode>true</tagNode>
+      <daemonHost>localhost:8125</daemonHost>
+      <targetMetricURL>https://app.datadoghq.com/api/</targetMetricURL>
+    </org.datadog.jenkins.plugins.datadog.DatadogBuildListener_-DescriptorImpl>
+
+  jenkins.CLI.xml: |-
+    <?xml version='1.1' encoding='UTF-8'?>
+    <jenkins.CLI>
+{{- if .Values.jenkins.master.cli }}
+      <enabled>true</enabled>
+{{- else }}
+      <enabled>false</enabled>
+{{- end }}
+    </jenkins.CLI>
+  apply_config.sh: |-
+    mkdir -p /usr/share/jenkins/ref/secrets/;
+    echo "false" > /usr/share/jenkins/ref/secrets/slave-to-master-security-kill-switch;
+    cp /var/jenkins_config/config.xml ${JENKINS_HOME};
+    cp /var/jenkins_config/saml-idp-metadata.xml ${JENKINS_HOME};
+    cp /var/jenkins_config/jenkins.model.JenkinsLocationConfiguration.xml ${JENKINS_HOME};
+    cp /var/jenkins_config/github-plugin-configuration.xml ${JENKINS_HOME};
+    cp /var/jenkins_config/org.jenkinsci.plugins.workflow.libs.GlobalLibraries.xml ${JENKINS_HOME};
+    cp /var/jenkins_config/org.datadog.jenkins.plugins.datadog.DatadogBuildListener.xml ${JENKINS_HOME};
+    cp /var/jenkins_config/jenkins.CLI.xml ${JENKINS_HOME};
+    cp /var/jenkins_config/audit-trail.xml ${JENKINS_HOME};
+    cp /var/jenkins_config/jobConfigHistory.xml ${JENKINS_HOME};
+{{- if .Values.jenkins.master.installPlugins }}
+    # Install missing plugins
+    cp /var/jenkins_config/plugins.txt ${JENKINS_HOME};
+    rm -rf /usr/share/jenkins/ref/plugins/*.lock
+    /usr/local/bin/install-plugins.sh `echo $(cat ${JENKINS_HOME}/plugins.txt)`;
+
+    # Copy OpenGov Plugins
+    cp /tmp/plugins/* /usr/share/jenkins/ref/plugins/;
+
+    # Copy plugins to shared volume
+    cp -rn /usr/share/jenkins/ref/plugins/* /var/jenkins_plugins;
+
+{{- end }}
+{{- if .Values.jenkins.master.scriptApproval }}
+    cp /var/jenkins_config/scriptapproval.xml ${JENKINS_HOME}/scriptApproval.xml;
+{{- end }}
+{{- if .Values.jenkins.master.initScripts }}
+    mkdir -p ${JENKINS_HOME}/init.groovy.d/;
+    cp /var/jenkins_config/*.groovy ${JENKINS_HOME}/init.groovy.d/
+{{- end }}
+{{- if .Values.jenkins.master.credentialsXmlSecret }}
+    cp /var/jenkins_credentials/credentials.xml ${JENKINS_HOME};
+{{- end }}
+{{- if .Values.jenkins.master.secretsFilesSecret }}
+    cp /var/jenkins_secrets/* /usr/share/jenkins/ref/secrets;
+{{- end }}
+{{- if .Values.jenkins.master.jobs }}
+    for job in $(ls /var/jenkins_jobs); do
+      mkdir -p ${JENKINS_HOME}/jobs/$job
+      cp /var/jenkins_jobs/$job ${JENKINS_HOME}/jobs/$job/config.xml
+    done
+{{- end }}
+    ln -sf {{ .Values.secretsPath }} ${JENKINS_HOME}/init.groovy.d/;
+    cp /var/jenkins_config/repositories.txt  ${JENKINS_HOME}/init.groovy.d/;
+
+  # The initialization Jenkins scripts
+{{ (.Files.Glob "scripts/*.groovy").AsConfig | indent 2 }}
+
+  # Repositories to begin watching
+  repositories.txt: |-
+{{- range $index, $val := .Values.repositories }}
+  {{ $val | indent 4 }}
+{{- end }}
+
+  # List of plugins to install
+  plugins.txt: |-
+{{- if .Values.jenkins.master.installPlugins }}
+{{- range $index, $val := .Values.jenkins.master.installPlugins }}
+{{ $val | indent 4 }}
+{{- end }}
+{{- end }}
+
+  
+  audit-trail.xml: |-
+    <hudson.plugins.audit__trail.AuditTrailPlugin plugin="audit-trail@3.2">
+    <pattern>.*/(?:configSubmit|doDelete)</pattern>
+    <logBuildCause>true</logBuildCause>
+    <loggers>
+      <hudson.plugins.audit__trail.SyslogAuditLogger>
+        <syslogServerHostname>localhost</syslogServerHostname>
+        <syslogServerPort>8080</syslogServerPort>
+        <appName>jenkins</appName>
+        <facility>USER</facility>
+        <messageFormat>RFC_3164</messageFormat>
+      </hudson.plugins.audit__trail.SyslogAuditLogger>
+      <hudson.plugins.audit__trail.LogFileAuditLogger>
+        <log>/tmp/log/jenkins/audit-0.log</log>
+        <limit>50</limit>
+        <count>10</count>
+      </hudson.plugins.audit__trail.LogFileAuditLogger>
+    </loggers>
+
+
+  jobConfigHistory.xml: |-
+    <hudson.plugins.jobConfigHistory.JobConfigHistory plugin="jobConfigHistory@2.26">
+      <historyRootDir></historyRootDir>
+      <maxHistoryEntries>50</maxHistoryEntries>
+      <maxEntriesPerPage>30</maxEntriesPerPage>
+      <maxDaysToKeepEntries>90</maxDaysToKeepEntries>
+      <excludedUsers></excludedUsers>
+      <skipDuplicateHistory>true</skipDuplicateHistory>
+      <excludePattern>queue\.xml|nodeMonitors\.xml|UpdateCenter\.xml|global-build-stats|LockableResourcesManager\.xml|MilestoneStep\.xml</excludePattern>
+      <saveModuleConfiguration>false</saveModuleConfiguration>
+      <showBuildBadges>always</showBuildBadges>
+      <showChangeReasonCommentWindow>true</showChangeReasonCommentWindow>
+    </hudson.plugins.jobConfigHistory.JobConfigHistory>
