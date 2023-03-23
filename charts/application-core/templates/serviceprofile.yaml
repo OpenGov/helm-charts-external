@@ -1,0 +1,19 @@
+{{- if .Values.serviceProfile.create -}}
+apiVersion: linkerd.io/v1alpha2
+kind: ServiceProfile
+metadata:
+  name: {{ include "application-core.serviceAccountName" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  labels:
+    {{- include "application-core.labels" . | nindent 4 }}
+  annotations:
+    {{- include "application-core.annotations" $ | nindent 4 }}
+spec:
+  retryBudget:
+    retryRatio: {{ .Values.serviceProfile.retryBudget.retryRatio | float64 }}
+    minRetriesPerSecond: {{ .Values.serviceProfile.retryBudget.minRetriesPerSecond | int }}
+    ttl: {{ .Values.serviceProfile.retryBudget.ttl | toString }}
+  routes:
+    {{- with .Values.serviceProfile.routes }}
+    {{- toYaml . | nindent 8 }}
+    {{- end }}
+{{- end }}
