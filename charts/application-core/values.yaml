@@ -1,0 +1,152 @@
+# Default values for application-core.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 30%
+
+serviceAccount:
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+deploymentAnnotations:
+  reloader.stakater.com/auto: "true"
+
+deploymentStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 25%
+    maxSurge: 25%
+
+podAnnotations:
+  linkerd.io/inject: enabled
+  # One second longer than lifecycle.preStop.exec.command
+  config.alpha.linkerd.io/proxy-wait-before-exit-seconds: "31"
+
+podSecurityContext: {}
+
+emptyDir: {}
+  # mountPath: /empty-dir
+  # sizeLimit: 1024Mi
+
+securityContext:
+  allowPrivilegeEscalation: false
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/service-upstream: "true"
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+configMap:
+  enabled: false
+  data: {}
+
+externalSecret:
+  enabled: false
+  data: []
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: cluster-secret-store
+  target:
+    creationPolicy: Owner
+    deletionPolicy: Retain
+    template: {}
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+
+lifecycle:
+  preStop:
+    exec:
+      command: ["/bin/sh", "-c", "sleep 30"]
+
+terminationGracePeriodSeconds: 60
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  type: "scaledobject"  # Can be 'hpa'
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+serviceProfile:
+  create: false
+  routes: {}
+  #  RetryBudget describes the maximum number of retries that should be issued
+  #  to this service.
+  retryBudget:
+    #   The retryRatio is the maximum ratio of retries requests to original
+    #   requests.  A retryRatio of 0.2 means that retries may add at most an
+    #   additional 20% to the request load.
+    retryRatio: 0.2
+    #   This is an allowance of retries per second in addition to those allowed
+    #   by the retryRatio.  This allows retries to be performed, when the request
+    #   rate is very low.
+    minRetriesPerSecond: 10
+    #   This duration indicates for how long requests should be considered for the
+    #   purposes of calculating the retryRatio.  A higher value considers a larger
+    #   window and therefore allows burstier retries.
+    ttl: 10s
+
+nodeSelector: {}
+
+tolerations: []
