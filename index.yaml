@@ -2,6 +2,15 @@ apiVersion: v1
 entries:
   application-core:
   - apiVersion: v2
+    created: "2023-03-29T20:08:10.694518931Z"
+    description: A Helm chart for Kubernetes Deployments
+    digest: fea4ed7d2a478cc454761d5940d8460ab2e11fd983a85c287867b3c8dfb78256
+    name: application-core
+    type: application
+    urls:
+    - https://github.com/OpenGov/helm-charts-external/releases/download/application-core-1.0.0/application-core-1.0.0.tgz
+    version: 1.0.0
+  - apiVersion: v2
     created: "2023-03-23T18:54:43.685220892Z"
     description: A Helm chart for Kubernetes Deployments
     digest: 6481b07163ef66be9aa62414f72d511117560a4210f39ff192a7f516b823d092
@@ -160,4 +169,4 @@ entries:
     urls:
     - https://github.com/OpenGov/helm-charts-external/releases/download/vouch-1.0.0/vouch-1.0.0.tgz
     version: 1.0.0
-generated: "2023-03-23T18:54:43.685239792Z"
+generated: "2023-03-29T20:08:10.69453723Z"
