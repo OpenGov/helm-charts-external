@@ -7,6 +7,9 @@ metadata:
     {{- include "application-core.labels" . | nindent 4 }}
   annotations:
     {{- include "application-core.annotations" $ | nindent 4 }}
+    {{- with .Values.autoscaling.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
