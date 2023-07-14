@@ -64,6 +64,7 @@ ingress:
   className: "nginx"
   annotations:
     nginx.ingress.kubernetes.io/service-upstream: "true"
+    external-dns.alpha.kubernetes.io/ingress-hostname-source: annotation-only
     # kubernetes.io/tls-acme: "true"
   hosts:
     - host: chart-example.local
