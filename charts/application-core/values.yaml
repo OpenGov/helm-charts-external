@@ -61,8 +61,8 @@ service:
 
 sessionAffinity:
   enabled: false
-  #cookieName: "JSESSIONID"
-  mode: persistent # persistent|balanced
+  # cookieName: "JSESSIONID"
+  mode: persistent  # persistent|balanced
 
 ingress:
   enabled: false
