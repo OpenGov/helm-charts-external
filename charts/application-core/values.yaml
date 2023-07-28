@@ -59,11 +59,15 @@ service:
   type: ClusterIP
   port: 8000
 
+sessionAffinity:
+  enabled: false
+  #cookieName: "JSESSIONID"
+  mode: persistent # persistent|balanced
+
 ingress:
   enabled: false
   className: "nginx"
   annotations:
-    nginx.ingress.kubernetes.io/service-upstream: "true"
     external-dns.alpha.kubernetes.io/ingress-hostname-source: annotation-only
     # kubernetes.io/tls-acme: "true"
   hosts:

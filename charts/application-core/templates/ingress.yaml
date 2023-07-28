@@ -12,6 +12,22 @@ metadata:
     {{- include "application-core.annotations" $ | nindent 4 }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
+    {{- if not .Values.sessionAffinity.enabled }}
+    nginx.ingress.kubernetes.io/service-upstream: "true"
+    {{- end}}
+    {{- if .Values.sessionAffinity.enabled }}
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    {{- if .Values.sessionAffinity.cookieName }}
+    nginx.ingress.kubernetes.io/session-cookie-name: {{ .Values.sessionAffinity.cookieName | quote }}
+    {{- end }}
+    {{- if .Values.sessionAffinity.mode }}
+    nginx.ingress.kubernetes.io/affinity-mode: {{ .Values.sessionAffinity.mode | quote }}
+    {{- end }}
+    nginx.ingress.kubernetes.io/configuration-snippet: | 
+      {{- if .Values.sessionAffinity.enabled }}
+      proxy_set_header l5d-dst-override $service_name.$namespace.svc.cluster.local:$service_port;
+      {{- end }}
+    {{- end }}
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   {{- if .Values.ingress.tls }}
