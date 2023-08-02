@@ -7,9 +7,9 @@ metadata:
   name: {{ $fullName }}
   labels:
     {{- include "application-core.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
   annotations:
     {{- include "application-core.annotations" $ | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
     {{- if not .Values.sessionAffinity.enabled }}
