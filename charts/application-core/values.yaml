@@ -58,6 +58,7 @@ securityContext:
 service:
   type: ClusterIP
   port: 8000
+  annotations: {}
 
 sessionAffinity:
   enabled: false
