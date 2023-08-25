@@ -58,3 +58,4 @@ subjects:
     name: {{ template "karpenter.serviceAccountName" . }}
     namespace: {{ .Release.Namespace }}
     
+    

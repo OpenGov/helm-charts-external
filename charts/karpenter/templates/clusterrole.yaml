@@ -45,4 +45,5 @@ rules:
     resources: ["awsnodetemplates", "awsnodetemplates/status"]
     verbs: ["patch", "update"]
     
+    
 

@@ -17,3 +17,5 @@ rules:
     resources: ["awsnodetemplates"]
     verbs: ["get", "list", "watch", "create", "delete", "patch"]
     
+
+    
