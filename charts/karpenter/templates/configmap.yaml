@@ -11,3 +11,4 @@ metadata:
   {{- end }}
 data:
   {{- list .Values.settings "" | include "flattenSettings" | indent 2 }}
+  

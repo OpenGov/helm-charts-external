@@ -44,3 +44,5 @@ rules:
   - apiGroups: ["karpenter.k8s.aws"]
     resources: ["awsnodetemplates", "awsnodetemplates/status"]
     verbs: ["patch", "update"]
+    
+
