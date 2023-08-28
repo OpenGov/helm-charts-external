@@ -70,4 +70,4 @@ rules:
   {{- with .Values.additionalClusterRoleRules -}}
   {{ toYaml . | nindent 2 }}
   {{- end -}}
-    
+  

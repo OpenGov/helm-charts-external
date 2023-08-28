@@ -22,4 +22,3 @@ spec:
       protocol: TCP
   selector:
     {{- include "karpenter.selectorLabels" . | nindent 4 }}
-    

@@ -53,5 +53,3 @@ webhooks:
     objectSelector:
       matchLabels:
         app.kubernetes.io/part-of: {{ template "karpenter.name" . }}
-        
-              
