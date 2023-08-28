@@ -15,7 +15,5 @@ rules:
     verbs: ["get", "list", "watch", "create", "delete", "patch"]
   - apiGroups: ["karpenter.k8s.aws"]
     resources: ["awsnodetemplates"]
-    verbs: ["get", "list", "watch", "create", "delete", "patch"]
-    
-
-    
+    verbs: ["get", "list", "watch", "create", "delete", "patch"]     
+     
