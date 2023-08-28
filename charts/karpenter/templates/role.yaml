@@ -63,6 +63,7 @@ rules:
     resources: ["services"]
     resourceNames: ["kube-dns"]
     verbs: ["get"]
+<<<<<<< HEAD
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -84,3 +85,5 @@ rules:
   - apiGroups: ["coordination.k8s.io"]
     resources: ["leases"]
     verbs: ["delete"]
+=======
+>>>>>>> e39a9ee (updated chart.yaml and values.yaml)

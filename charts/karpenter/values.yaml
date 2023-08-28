@@ -99,9 +99,9 @@ controller:
     # -- Repository path to the controller image.
     repository: public.ecr.aws/karpenter/controller
     # -- Tag of the controller image.
-    tag: v0.30.0-rc.0
+    tag: v0.28.0
     # -- SHA256 digest of the controller image.
-    digest: sha256:06f08a2c9b5125a2da57936a5ccfb54e5796677e247fb0bb960e70e79242a147
+    digest: sha256:4194fc219d5a1019cd8d7d69f518b903e972966cad2e9420ccbe9dca149f179d
   # -- SecurityContext for the controller container.
   securityContext: {}
   # -- Additional environment variables for the controller pod.
@@ -166,12 +166,6 @@ settings:
   batchIdleDuration: 1s
   # -- AWS-specific configuration values
   aws:
-    # -- Role to assume for calling AWS services.
-    assumeRoleARN: ""
-    # -- Duration of assumed credentials in minutes. Default value is 15 minutes. Not used unless aws.assumeRoleARN set.
-    assumeRoleDuration: 15m
-    # -- Cluster CA bundle for TLS configuration of provisioned nodes. If not set, this is taken from the controller's TLS configuration for the API server.
-    clusterCABundle: ""
     # -- Cluster name.
     clusterName: ""
     # -- Cluster endpoint. If not set, will be discovered during startup (EKS only)

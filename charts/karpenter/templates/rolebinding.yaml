@@ -37,6 +37,7 @@ subjects:
   - kind: ServiceAccount
     name: {{ template "karpenter.serviceAccountName" . }}
     namespace: {{ .Release.Namespace }}
+<<<<<<< HEAD
 --- 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -57,3 +58,6 @@ subjects:
   - kind: ServiceAccount
     name: {{ template "karpenter.serviceAccountName" . }}
     namespace: {{ .Release.Namespace }}
+=======
+    
+>>>>>>> e39a9ee (updated chart.yaml and values.yaml)

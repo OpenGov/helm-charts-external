@@ -42,6 +42,9 @@ rules:
     resourceNames: ["defaulting.webhook.karpenter.k8s.aws"]
   # Write
   - apiGroups: ["karpenter.k8s.aws"]
-    resources: ["awsnodetemplates", "awsnodetemplates/status"]
+    resources: ["awsnodetemplates/status"]
     verbs: ["patch", "update"]
+<<<<<<< HEAD
        
+=======
+>>>>>>> e39a9ee (updated chart.yaml and values.yaml)
