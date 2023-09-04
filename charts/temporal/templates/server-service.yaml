@@ -1,5 +1,4 @@
 {{- if $.Values.server.enabled }}
----
 apiVersion: v1
 kind: Service
 metadata:
@@ -33,7 +32,6 @@ spec:
 
 {{- range $service := (list "frontend" "matching" "history" "worker") }}
 {{- $serviceValues := index $.Values.server $service -}}
----
 apiVersion: v1
 kind: Service
 metadata:
