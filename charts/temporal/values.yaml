@@ -118,9 +118,9 @@ server:
           # maxConns: 2
 
         sql:
-          driver: "mysql"
+          driver: "postgres"
           host: "mysql"
-          port: 3306
+          port: 5432
           database: "temporal"
           user: "temporal"
           password: "temporal"
@@ -151,9 +151,9 @@ server:
               serialConsistency: "local_serial"
 
         sql:
-          driver: "mysql"
+          driver: "postgres"
           host: "mysql"
-          port: 3306
+          port: 5432
           database: "temporal_visibility"
           user: "temporal"
           password: "temporal"
@@ -370,12 +370,12 @@ elasticsearch:
   visibilityIndex: "temporal_visibility_v1_dev"
 
 prometheus:
-  enabled: true
+  enabled: false
   nodeExporter:
     enabled: false
 
 grafana:
-  enabled: true
+  enabled: false
   replicas: 1
   testFramework:
     enabled: false
@@ -432,7 +432,7 @@ grafana:
         datasource: TemporalMetrics
 
 cassandra:
-  enabled: true
+  enabled: false
   persistence:
     enabled: false
   image:
@@ -452,3 +452,5 @@ cassandra:
 
 mysql:
   enabled: false
+postgresql:
+  enabled: true
