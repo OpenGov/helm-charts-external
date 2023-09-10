@@ -99,11 +99,11 @@ server:
       additionalStores: {}
 
       default:
-        driver: "sql"
+        driver: "cassandra"
 
         cassandra:
           hosts: []
-          port: 9042
+          # port: 9042
           keyspace: "temporal"
           user: "user"
           password: "password"
@@ -118,9 +118,9 @@ server:
           # maxConns: 2
 
         sql:
-          driver: "postgres"
+          driver: "mysql"
           host: "mysql"
-          port: 5432
+          port: 3306
           database: "temporal"
           user: "temporal"
           password: "temporal"
@@ -132,11 +132,11 @@ server:
           # tx_isolation: 'READ-COMMITTED'
 
       visibility:
-        driver: "sql"
+        driver: "cassandra"
 
         cassandra:
           hosts: []
-          port: 9042
+          # port: 9042
           keyspace: "temporal_visibility"
           user: "user"
           password: "password"
@@ -151,9 +151,9 @@ server:
               serialConsistency: "local_serial"
 
         sql:
-          driver: "postgres"
+          driver: "mysql"
           host: "mysql"
-          port: 5432
+          port: 3306
           database: "temporal_visibility"
           user: "temporal"
           password: "temporal"
@@ -301,18 +301,22 @@ web:
     # loadBalancerIP:
 
   ingress:
-    enabled: false
-    # className:
+    enabled: true
+    className: alb
     annotations: {}
-    # kubernetes.io/ingress.class: traefik
-    # ingress.kubernetes.io/ssl-redirect: "false"
+    kubernetes.io/ingress.class: traefik
+    # ingress.kubernetes.io/ssl-redirect: "true"
     # traefik.frontend.rule.type: PathPrefix
+  #   alb.ingress.kubernetes.io/scheme: "internet-facing"                                                                                                                                                                          │
+  # # # │alb.ingress.kubernetes.io/security-groups: "sg-042081a1c69c1d8be"                                                                                                                                                                                    │
+  #   alb.ingress.kubernetes.io/success-codes: "200"
+  
     hosts:
-      - "/"
+      - "csw.integration.opengov.zone"
       # - "domain.com/xyz"
       # - "domain.com"
     tls: []
-    #  - secretName: chart-example-tls
+    #  - secretName: chart-example-tlsuuuu
     #    hosts:
     #      - chart-example.local
 
@@ -370,12 +374,12 @@ elasticsearch:
   visibilityIndex: "temporal_visibility_v1_dev"
 
 prometheus:
-  enabled: false
+  enabled: true
   nodeExporter:
     enabled: false
 
 grafana:
-  enabled: false
+  enabled: true
   replicas: 1
   testFramework:
     enabled: false
@@ -432,7 +436,7 @@ grafana:
         datasource: TemporalMetrics
 
 cassandra:
-  enabled: false
+  enabled: true
   persistence:
     enabled: false
   image:
@@ -452,5 +456,3 @@ cassandra:
 
 mysql:
   enabled: false
-postgresql:
-  enabled: true
