@@ -39,6 +39,34 @@ spec:
       serviceAccountName: {{ include "application-core.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.initContainer.enabled }}
+      initContainers:
+        - name: {{ include "application-core.fullname" . }}-init
+          securityContext:
+            {{- toYaml .Values.initContainer.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.initContainer.args }}
+          args: {{ .Values.initContainer.args }}
+          {{- end }}
+          {{- if .Values.initContainer.command }}
+          args: {{ .Values.initContainer.command }}
+          {{- end }}
+          {{- if or .Values.externalSecret.enabled .Values.configMap.enabled }}
+          envFrom:
+            {{- if .Values.configMap.enabled }}
+            - configMapRef:
+                name: {{ include "application-core.fullname" . }}-config
+            {{- end }}
+            {{- if .Values.externalSecret.enabled }}
+            - secretRef:
+                name: {{ include "application-core.fullname" . }}-config
+            {{- end }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.initContainer.resources | nindent 12 }}
+          terminationMessagePolicy: FallbackToLogsOnError
+      {{- end }}
       containers:
         - name: {{ include "application-core.fullname" . }}
           securityContext:
@@ -85,6 +113,7 @@ spec:
             - mountPath: {{ .Values.emptyDir.mountPath }}
               name: emptydir-volume
           {{- end }}
+          terminationMessagePolicy: FallbackToLogsOnError
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
