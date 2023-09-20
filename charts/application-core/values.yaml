@@ -156,3 +156,11 @@ serviceProfile:
 nodeSelector: {}
 
 tolerations: []
+
+initContainer:
+  enabled: false
+  args: []
+  command: []
+  resources: {}
+  securityContext:
+    allowPrivilegeEscalation: false
