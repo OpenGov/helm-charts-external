@@ -50,7 +50,7 @@ spec:
           args: {{ .Values.initContainer.args }}
           {{- end }}
           {{- if .Values.initContainer.command }}
-          args: {{ .Values.initContainer.command }}
+          command: {{ .Values.initContainer.command }}
           {{- end }}
           {{- if or .Values.externalSecret.enabled .Values.configMap.enabled }}
           envFrom:
