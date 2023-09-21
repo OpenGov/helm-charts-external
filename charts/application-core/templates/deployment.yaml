@@ -47,10 +47,16 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.initContainer.args }}
-          args: {{ .Values.initContainer.args }}
+          args: 
+          {{- range .Values.initContainer.args }}
+            - {{ . }}
+          {{- end }}
           {{- end }}
           {{- if .Values.initContainer.command }}
-          command: {{ .Values.initContainer.command }}
+          command: 
+          {{- range .Values.initContainer.command }}
+            - {{ . }}
+          {{- end }}
           {{- end }}
           {{- if or .Values.externalSecret.enabled .Values.configMap.enabled }}
           envFrom:
