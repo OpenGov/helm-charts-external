@@ -136,7 +136,23 @@ autoscaling:
 
 serviceProfile:
   create: false
-  routes: {}
+  routes:
+    - condition:
+        method: GET
+      name: Catch-all GET
+      timeout: 60s
+    - condition:
+        method: POST
+      name: Catch-all POST
+      timeout: 60s
+    - condition:
+        method: PUT
+      name: Catch-all PUT
+      timeout: 60s
+    - condition:
+        method: DELETE
+      name: Catch-all DELETE
+      timeout: 60s
   #  RetryBudget describes the maximum number of retries that should be issued
   #  to this service.
   retryBudget:
