@@ -139,28 +139,19 @@ serviceProfile:
   routes:
     - condition:
         method: GET
-        pathRegex: .*
       name: Catch-all GET
       timeout: 60s
     - condition:
         method: POST
-        pathRegex: .*
       name: Catch-all POST
       timeout: 60s
     - condition:
         method: PUT
-        pathRegex: .*
       name: Catch-all PUT
       timeout: 60s
     - condition:
         method: DELETE
-        pathRegex: .*
       name: Catch-all DELETE
-      timeout: 60s
-    - condition:
-        method: PATCH
-        pathRegex: .*
-      name: Catch-all PATCH
       timeout: 60s
   #  RetryBudget describes the maximum number of retries that should be issued
   #  to this service.
