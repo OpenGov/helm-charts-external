@@ -341,22 +341,6 @@ web:
       # - "domain.com/xyz"
       # - "domain.com"
     tls: []
-    #  - secretName: chart-example-tls
-    enabled: true
-    className: alb
-    annotations: {}
-    kubernetes.io/ingress.class: traefik
-    # ingress.kubernetes.io/ssl-redirect: "true"
-    # traefik.frontend.rule.type: PathPrefix
-  #   alb.ingress.kubernetes.io/scheme: "internet-facing"                                                                                                                                                                          │
-  # # # │alb.ingress.kubernetes.io/security-groups: "sg-042081a1c69c1d8be"                                                                                                                                                                                    │
-  #   alb.ingress.kubernetes.io/success-codes: "200"
-  
-    hosts:
-      - "csw.integration.opengov.zone"
-      # - "domain.com/xyz"
-      # - "domain.com"
-    tls: []
     #  - secretName: chart-example-tlsuuuu
     #    hosts:
     #      - chart-example.local
