@@ -436,6 +436,27 @@ entries:
   zookeeper:
   - apiVersion: v1
     appVersion: 3.5.5
+    created: "2023-11-28T15:55:05.429204909Z"
+    description: Centralized service for maintaining configuration information, naming,
+      providing distributed synchronization, and providing group services.
+    digest: 32b3a9ba07c785f5e1658363b09aeb7cce690dfbab96ff6714505691f525d2fa
+    home: https://zookeeper.apache.org/
+    icon: https://zookeeper.apache.org/images/zookeeper_small.gif
+    kubeVersion: ^1.10.0-0
+    maintainers:
+    - email: lachlan.evenson@microsoft.com
+      name: lachie83
+    - email: owensk@google.com
+      name: kow3ns
+    name: zookeeper
+    sources:
+    - https://github.com/apache/zookeeper
+    - https://github.com/kubernetes/contrib/tree/master/statefulsets/zookeeper
+    urls:
+    - https://github.com/OpenGov/helm-charts-external/releases/download/zookeeper-2.1.5/zookeeper-2.1.5.tgz
+    version: 2.1.5
+  - apiVersion: v1
+    appVersion: 3.5.5
     created: "2023-08-17T23:34:40.504152448Z"
     description: Centralized service for maintaining configuration information, naming,
       providing distributed synchronization, and providing group services.
@@ -455,4 +476,4 @@ entries:
     urls:
     - https://github.com/OpenGov/helm-charts-external/releases/download/zookeeper-2.1.4/zookeeper-2.1.4.tgz
     version: 2.1.4
-generated: "2023-11-20T22:13:58.799294724Z"
+generated: "2023-11-28T15:55:05.429290569Z"
