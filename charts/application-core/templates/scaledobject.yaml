@@ -1,4 +1,5 @@
 {{- if and .Values.autoscaling.enabled (eq .Values.autoscaling.type "scaledobject" ) }}
+{{- $fullName := include "application-core.fullname" .  -}}
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
@@ -20,16 +21,35 @@ spec:
   minReplicaCount: {{ .Values.autoscaling.minReplicas }}
   maxReplicaCount: {{ .Values.autoscaling.maxReplicas }}
   triggers:
-    {{- if .Values.autoscaling.targetCPUUtilizationPercentage }}
+    {{- if and .Values.autoscaling.targetCPUUtilizationPercentage (not .Values.autoscaling.kafka )}}
     - type: cpu
       metricType: Utilization
       metadata:
         value: {{ .Values.autoscaling.targetCPUUtilizationPercentage | quote }}
     {{- end }}
-    {{- if .Values.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- if and .Values.autoscaling.targetMemoryUtilizationPercentage (not .Values.autoscaling.kafka )}}
     - type: memory
       metricType: Utilization
       metadata:
         value: {{ .Values.autoscaling.targetMemoryUtilizationPercentage | quote }}
+    {{- end }}
+    {{- if .Values.autoscaling.kafka }}
+    - type: kafka
+      metadata:
+      {{- with .Values.autoscaling.kafka }}
+        bootstrapServers: {{ .bootstrapServers }}
+        consumerGroup: {{ default $fullName .consumerGroup }}
+        topic: {{ .topic }}
+        lagThreshold: {{ default 5 .lagThreshold | quote }}
+        offsetResetPolicy: {{ default "latest" .offsetResetPolicy }}
+        allowIdleConsumers: false
+        scaleToZeroOnInvalidOffset: false
+        excludePersistentLag: false
+        sasl: {{ default "plaintext" .sasl }}
+        tls: {{ default "enable" .tls }}
+        username: {{ .username }}
+      authenticationRef:
+        name: {{ default "keda-kafka-creds" .authenticationRef }}
+      {{- end }}
     {{- end }}
 {{- end }}

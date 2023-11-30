@@ -134,6 +134,10 @@ autoscaling:
   maxReplicas: 10
   targetCPUUtilizationPercentage: 80
   targetMemoryUtilizationPercentage: 80
+  # kafka:
+  #   topic: this-topic
+  #   bootstrapServers: this.web.address:9092
+  #   username: thisusername
 
 serviceProfile:
   create: false
