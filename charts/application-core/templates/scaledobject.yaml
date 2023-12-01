@@ -42,9 +42,9 @@ spec:
         topic: {{ .topic }}
         lagThreshold: {{ default 5 .lagThreshold | quote }}
         offsetResetPolicy: {{ default "latest" .offsetResetPolicy }}
-        allowIdleConsumers: false
-        scaleToZeroOnInvalidOffset: false
-        excludePersistentLag: false
+        allowIdleConsumers: "false"
+        scaleToZeroOnInvalidOffset: "false"
+        excludePersistentLag: "false"
         sasl: {{ default "plaintext" .sasl }}
         tls: {{ default "enable" .tls }}
         username: {{ .username }}
