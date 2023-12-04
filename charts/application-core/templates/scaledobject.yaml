@@ -47,9 +47,9 @@ spec:
         excludePersistentLag: "false"
         sasl: {{ default "plaintext" .sasl }}
         tls: {{ default "enable" .tls }}
-        username: {{ .username }}
       authenticationRef:
         name: {{ default "keda-kafka-creds" .authenticationRef }}
+        kind: {{ default "ClusterTriggerAuthentication" .authenticationRefKind }}
       {{- end }}
     {{- end }}
 {{- end }}
