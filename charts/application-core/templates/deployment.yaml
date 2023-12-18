@@ -129,7 +129,7 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchExpressions:
-                  - key: app
+                  - key: app.kubernetes.io/name
                     operator: In
                     values:
                       - {{ include "application-core.fullname" . }}
@@ -140,7 +140,7 @@ spec:
           whenUnsatisfiable: ScheduleAnyway
           labelSelector:
             matchExpressions:
-              - key: app
+              - key: app.kubernetes.io/name
                 operator: In
                 values:
                   - {{ include "application-core.fullname" . }}
