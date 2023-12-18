@@ -126,16 +126,6 @@ spec:
       {{- end }}
       affinity:
         podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                    - key: app
-                      operator: In
-                      values:
-                        - {{ include "application-core.fullname" . }}
-                topologyKey: topology.kubernetes.io/zone
-              weight: 100
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchExpressions:
@@ -144,6 +134,16 @@ spec:
                     values:
                       - {{ include "application-core.fullname" . }}
               topologyKey: "kubernetes.io/hostname"
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - {{ include "application-core.fullname" . }}
       {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
