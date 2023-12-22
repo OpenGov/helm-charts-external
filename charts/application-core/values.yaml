@@ -132,12 +132,44 @@ autoscaling:
   type: "scaledobject"  # Can be 'hpa'
   minReplicas: 1
   maxReplicas: 10
-  targetCPUUtilizationPercentage: 80
-  targetMemoryUtilizationPercentage: 80
+
+  # targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
   # kafka:
   #   topic: this-topic
   #   bootstrapServers: this.web.address:9092
   #   username: thisusername
+
+  # prometheus:
+  #   serverAddress: http://prometheus.monitoring.svc.cluster.local:9090
+  #   query: |-
+  #     sum(rate(http_requests_total{job="nginx-ingress"}[1m])) by (namespace)
+  #   threshold: 10.3
+
+  # cron:
+  #   timezone: Asia/Kolkata
+  #   start: 30 * * * *
+  #   end: 45 * * * *
+  #   desiredReplicas: "10"
+
+  # Alternatively, just specify the entire trigger list yourself
+
+  # triggers:
+  #   - type: prometheus
+  #     metadata:
+  #       # Required fields:
+  #       serverAddress: http://<prometheus-host>:9090
+  #       query: sum(rate(http_requests_total{deployment="my-deployment"}[2m])) # Note: query must return a vector/scalar single element response
+  #       threshold: '100.50'
+  #       activationThreshold: '5.5'
+  #   - type: cron
+  #     metadata:
+  #       # Required
+  #       timezone: Asia/Kolkata  # The acceptable values would be a value from the IANA Time Zone Database.
+  #       start: 30 * * * *       # Every hour on the 30th minute
+  #       end: 45 * * * *         # Every hour on the 45th minute
+  #       desiredReplicas: "10"
 
 serviceProfile:
   create: false
