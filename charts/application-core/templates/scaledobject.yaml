@@ -1,4 +1,4 @@
-{{- if and .Values.autoscaling.enabled (eq .Values.autoscaling.type "scaledobject" ) }}
+{{- if and (and .Values.autoscaling.enabled (eq .Values.autoscaling.type "scaledobject" )) (coalesce .Values.autoscaling.targetMemoryUtilizationPercentage .Values.autoscaling.targetCPUUtilizationPercentage .Values.autoscaling.triggers .Values.autoscaling.kafka .Values.autoscaling.prometheus .Values.autoscaling.cron ) }}
 {{- $fullName := include "application-core.fullname" .  -}}
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
@@ -16,18 +16,19 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ include "application-core.fullname" . }}
-  pollingInterval: 30
-  cooldownPeriod: 300
+  pollingInterval: {{ default 30 .Values.autoscaling.pollingInterval }}
+  cooldownPeriod: {{ default 300 .Values.autoscaling.cooldownPeriod }}
   minReplicaCount: {{ .Values.autoscaling.minReplicas }}
   maxReplicaCount: {{ .Values.autoscaling.maxReplicas }}
   triggers:
-    {{- if and .Values.autoscaling.targetCPUUtilizationPercentage (not .Values.autoscaling.kafka )}}
+    {{- if not .Values.autoscaling.triggers -}}
+    {{- if .Values.autoscaling.targetCPUUtilizationPercentage}}
     - type: cpu
       metricType: Utilization
       metadata:
         value: {{ .Values.autoscaling.targetCPUUtilizationPercentage | quote }}
     {{- end }}
-    {{- if and .Values.autoscaling.targetMemoryUtilizationPercentage (not .Values.autoscaling.kafka )}}
+    {{- if .Values.autoscaling.targetMemoryUtilizationPercentage}}
     - type: memory
       metricType: Utilization
       metadata:
@@ -51,5 +52,34 @@ spec:
         name: {{ default "keda-kafka-creds" .authenticationRef }}
         kind: {{ default "ClusterTriggerAuthentication" .authenticationRefKind }}
       {{- end }}
+    {{- end }}
+    {{- if .Values.autoscaling.prometheus }}
+    - type: prometheus
+      metadata:
+      {{- with .Values.autoscaling.prometheus }}
+        serverAddress: {{ .serverAddress }}
+        query: {{ .query }}
+        threshold: {{ .threshold }}
+        activationThreshold: {{ default 0 .activationThreshold | quote }}
+        ignoreNullValues: {{ default "true" .ignoreNullValues | quote }}
+        unsafeSsl: "false"
+      authenticationRef:
+        name: {{ default "keda-prom-creds" .authenticationRef }}
+        kind: {{ default "ClusterTriggerAuthentication" .authenticationRefKind }}
+      {{- end }}
+    {{- end }}
+    {{- if .Values.autoscaling.cron }}
+    - type: cron
+      metadata:
+      {{- with .Values.autoscaling.cron }}
+        timezone: {{ default "UTC" .timezone }}
+        start: {{ .start }}
+        end: {{ .end }}
+        desiredReplicas: {{ .desiredReplicas }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- if .Values.autoscaling.triggers }}
+    {{- toYaml .Values.autoscaling.triggers | nindent 4 }}
     {{- end }}
 {{- end }}
