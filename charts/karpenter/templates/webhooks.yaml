@@ -1,3 +1,4 @@
+{{- if .Values.webhook.enabled }}
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
@@ -22,24 +23,14 @@ webhooks:
       - apiGroups:
           - karpenter.k8s.aws
         apiVersions:
-          - v1alpha1
+          - v1beta1
         operations:
           - CREATE
           - UPDATE
         resources:
-          - awsnodetemplates
-          - awsnodetemplates/status
+          - ec2nodeclasses
+          - ec2nodeclasses/status
         scope: '*'
-      - apiGroups:
-          - karpenter.sh
-        apiVersions:
-          - v1alpha5
-        resources:
-          - provisioners
-          - provisioners/status
-        operations:
-          - CREATE
-          - UPDATE
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
@@ -65,21 +56,12 @@ webhooks:
       - apiGroups:
           - karpenter.k8s.aws
         apiVersions:
-          - v1alpha1
+          - v1beta1
         operations:
           - CREATE
           - UPDATE
         resources:
-          - awsnodetemplates
-          - awsnodetemplates/status
+          - ec2nodeclasses
+          - ec2nodeclasses/status
         scope: '*'
-      - apiGroups:
-          - karpenter.sh
-        apiVersions:
-          - v1alpha5
-        resources:
-          - provisioners
-          - provisioners/status
-        operations:
-          - CREATE
-          - UPDATE
+{{- end }}
