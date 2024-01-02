@@ -59,7 +59,7 @@ spec:
       {{- with .Values.autoscaling.prometheus }}
         serverAddress: {{ .serverAddress }}
         query: {{ .query }}
-        threshold: {{ .threshold }}
+        threshold: {{ .threshold | quote }}
         activationThreshold: {{ default 0 .activationThreshold | quote }}
         ignoreNullValues: {{ default "true" .ignoreNullValues | quote }}
         unsafeSsl: "false"
