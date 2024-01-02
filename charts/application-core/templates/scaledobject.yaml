@@ -63,6 +63,7 @@ spec:
         activationThreshold: {{ default 0 .activationThreshold | quote }}
         ignoreNullValues: {{ default "true" .ignoreNullValues | quote }}
         unsafeSsl: "false"
+        authModes: {{ default "basic" .authModes | quote}}
       authenticationRef:
         name: {{ default "keda-prom-creds" .authenticationRef }}
         kind: {{ default "ClusterTriggerAuthentication" .authenticationRefKind }}
