@@ -294,6 +294,27 @@ entries:
     version: 2.5.4
   karpenter:
   - apiVersion: v2
+    appVersion: 0.32.3
+    created: "2024-01-30T13:45:56.414503082Z"
+    description: A Helm chart for Karpenter, an open-source node provisioning project
+      built for Kubernetes.
+    digest: 902c320e1ce502f26102d57ba3a84f054e1e2fcce2cea1c88d4d32f40e78871f
+    home: https://karpenter.sh/
+    icon: https://repository-images.githubusercontent.com/278480393/dab059c8-caa1-4b55-aaa7-3d30e47a5616
+    keywords:
+    - cluster
+    - node
+    - scheduler
+    - autoscaling
+    - lifecycle
+    name: karpenter
+    sources:
+    - https://github.com/aws/karpenter/
+    type: application
+    urls:
+    - https://github.com/OpenGov/helm-charts-external/releases/download/karpenter-0.32.3/karpenter-0.32.3.tgz
+    version: 0.32.3
+  - apiVersion: v2
     appVersion: 0.28.0
     created: "2023-08-29T12:25:27.443264331Z"
     description: A Helm chart for Karpenter, an open-source node provisioning project
@@ -564,4 +585,4 @@ entries:
     urls:
     - https://github.com/OpenGov/helm-charts-external/releases/download/zookeeper-2.1.4/zookeeper-2.1.4.tgz
     version: 2.1.4
-generated: "2024-01-02T21:26:26.367879242Z"
+generated: "2024-01-30T13:45:56.414690881Z"
