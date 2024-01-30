@@ -90,3 +90,4 @@ rules:
   - apiGroups: ["coordination.k8s.io"]
     resources: ["leases"]
     verbs: ["delete"]
+    

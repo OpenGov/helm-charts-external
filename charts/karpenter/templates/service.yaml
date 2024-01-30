@@ -28,3 +28,4 @@ spec:
   {{- end }}
   selector:
     {{- include "karpenter.selectorLabels" . | nindent 4 }}
+    
