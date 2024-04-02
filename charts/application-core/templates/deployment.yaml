@@ -10,7 +10,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  revisionHistoryLimit: 5
+  revisionHistoryLimit: 2
   progressDeadlineSeconds: 300
   {{- with .Values.deploymentStrategy }}
   strategy:
