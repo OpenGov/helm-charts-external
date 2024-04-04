@@ -76,7 +76,7 @@ spec:
         timezone: {{ default "UTC" .timezone }}
         start: {{ .start }}
         end: {{ .end }}
-        desiredReplicas: {{ .desiredReplicas }}
+        desiredReplicas: {{ .desiredReplicas | quote }}
       {{- end }}
     {{- end }}
     {{- end }}
