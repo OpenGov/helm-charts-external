@@ -58,7 +58,7 @@ spec:
             - {{ . }}
           {{- end }}
           {{- end }}
-          {{- if or .Values.externalSecret.enabled .Values.configMap.enabled }}
+          {{- if or .Values.externalSecret.enabled .Values.configMap.enabled .Values.extraConfigMaps .Values.extraSecrets }}
           envFrom:
             {{- if .Values.configMap.enabled }}
             - configMapRef:
@@ -67,6 +67,14 @@ spec:
             {{- if .Values.externalSecret.enabled }}
             - secretRef:
                 name: {{ include "application-core.fullname" . }}-config
+            {{- end }}
+            {{- range $configMap := .Values.extraConfigMaps }}
+            - configMapRef:
+                name: {{ $configMap }}
+            {{- end }}
+            {{- range $secret := .Values.extraSecrets }}
+            - secretRef:
+                name: {{ $secret }}
             {{- end }}
           {{- end }}
           resources:
@@ -101,7 +109,7 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- end }}
-          {{- if or .Values.externalSecret.enabled .Values.configMap.enabled }}
+          {{- if or .Values.externalSecret.enabled .Values.configMap.enabled .Values.extraConfigMaps .Values.extraSecrets }}
           envFrom:
             {{- if .Values.configMap.enabled }}
             - configMapRef:
@@ -110,6 +118,14 @@ spec:
             {{- if .Values.externalSecret.enabled }}
             - secretRef:
                 name: {{ include "application-core.fullname" . }}-config
+            {{- end }}
+            {{- range $configMap := .Values.extraConfigMaps }}
+            - configMapRef:
+                name: {{ $configMap }}
+            {{- end }}
+            {{- range $secret := .Values.extraSecrets }}
+            - secretRef:
+                name: {{ $secret }}
             {{- end }}
           {{- end }}
           resources:
