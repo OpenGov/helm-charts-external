@@ -86,6 +86,10 @@ configMap:
   enabled: false
   data: {}
 
+# extraConfigMaps and extraSecrets to be mounted as envFrom
+extraConfigMaps: []
+extraSecrets: []
+
 externalSecret:
   enabled: false
   data: []
