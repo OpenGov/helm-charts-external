@@ -58,6 +58,10 @@ spec:
             - {{ . }}
           {{- end }}
           {{- end }}
+          {{- if or .Values.env }}
+          env:
+            {{- .Values.env | toYaml | nindent 12 }}
+          {{- end }}
           {{- if or .Values.externalSecret.enabled .Values.configMap.enabled .Values.extraConfigMaps .Values.extraSecrets }}
           envFrom:
             {{- if .Values.configMap.enabled }}
@@ -108,6 +112,10 @@ spec:
           lifecycle:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- end }}
+          {{- if or .Values.env }}
+          env:
+            {{- .Values.env | toYaml | nindent 12 }}
           {{- end }}
           {{- if or .Values.externalSecret.enabled .Values.configMap.enabled .Values.extraConfigMaps .Values.extraSecrets }}
           envFrom:

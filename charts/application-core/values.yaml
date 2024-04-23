@@ -86,6 +86,12 @@ configMap:
   enabled: false
   data: {}
 
+env: []
+  # - name: FOO
+  #   value: BAR
+  # - name: BAZ
+  #   value: $(FOO)-$(FOO)
+
 # extraConfigMaps and extraSecrets to be mounted as envFrom
 extraConfigMaps: []
 extraSecrets: []
