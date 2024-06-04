@@ -40,7 +40,18 @@ podAnnotations:
   # One second longer than lifecycle.preStop.exec.command
   config.alpha.linkerd.io/proxy-wait-before-exit-seconds: "31"
 
-podSecurityContext: {}
+dnsConfig: {}
+  # options:
+  #   - name: single-request-reopen
+
+podSecurityContext:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
 
 emptyDir: {}
   # mountPath: /empty-dir
@@ -48,9 +59,8 @@ emptyDir: {}
 
 securityContext:
   allowPrivilegeEscalation: false
-  # capabilities:
-  #   drop:
-  #   - ALL
+  capabilities:
+    drop: ["ALL"]
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
   # runAsUser: 1000
@@ -227,3 +237,5 @@ initContainer:
   resources: {}
   securityContext:
     allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
