@@ -40,17 +40,29 @@ podAnnotations:
   # One second longer than lifecycle.preStop.exec.command
   config.alpha.linkerd.io/proxy-wait-before-exit-seconds: "31"
 
-podSecurityContext: {}
+dnsConfig:
+  {}
+  # options:
+  #   - name: single-request-reopen
 
-emptyDir: {}
+podSecurityContext:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+emptyDir:
+  {}
   # mountPath: /empty-dir
   # sizeLimit: 1024Mi
 
 securityContext:
   allowPrivilegeEscalation: false
-  # capabilities:
-  #   drop:
-  #   - ALL
+  capabilities:
+    drop: ["ALL"]
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
   # runAsUser: 1000
@@ -64,7 +76,7 @@ service:
 sessionAffinity:
   enabled: false
   # cookieName: "JSESSIONID"
-  mode: persistent  # persistent|balanced
+  mode: persistent # persistent|balanced
 
 ingress:
   enabled: false
@@ -86,7 +98,8 @@ configMap:
   enabled: false
   data: {}
 
-env: []
+env:
+  []
   # - name: FOO
   #   value: BAR
   # - name: BAZ
@@ -125,7 +138,8 @@ lifecycle:
 
 terminationGracePeriodSeconds: 60
 
-resources: {}
+resources:
+  {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -139,7 +153,7 @@ resources: {}
 
 autoscaling:
   enabled: false
-  type: "scaledobject"  # Can be 'hpa'
+  type: "scaledobject" # Can be 'hpa'
   minReplicas: 1
   maxReplicas: 10
 
@@ -227,3 +241,5 @@ initContainer:
   resources: {}
   securityContext:
     allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
