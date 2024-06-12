@@ -97,6 +97,8 @@ configMap:
   enabled: false
   data: {}
 
+command: []
+
 env:
   []
   # - name: FOO
