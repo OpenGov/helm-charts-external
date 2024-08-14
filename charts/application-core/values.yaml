@@ -240,6 +240,8 @@ initContainer:
   args: []
   command: []
   resources: {}
+  # repository: nginx
+  # tag: ""
   securityContext:
     allowPrivilegeEscalation: false
     capabilities:
