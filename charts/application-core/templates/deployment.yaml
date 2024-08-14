@@ -50,7 +50,11 @@ spec:
         - name: {{ include "application-core.fullname" . }}-init
           securityContext:
             {{- toYaml .Values.initContainer.securityContext | nindent 12 }}
+          {{- if .Values.initContainer.image }}
+          image: "{{ .Values.initContainer.image.repository }}:{{ .Values.initContainer.image.tag }}"
+          {{- else }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.initContainer.args }}
           args: 
