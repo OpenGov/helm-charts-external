@@ -112,6 +112,13 @@ extraSecrets: []
 
 externalSecret:
   enabled: false
+    # data:
+    # - remoteRef:
+    #     conversionStrategy: Default
+    #     decodingtrategy: None
+    #     key:
+    #     property: {{ .remoteRef.key }}
+    #   secretKey:
   data: []
   refreshInterval: 1h
   secretStoreRef:
