@@ -154,8 +154,15 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- if .Values.emptyDir }}
           volumeMounts:
+          {{- range $volume := .Values.extraConfigMapVolumes }}
+            - mountPath: "{{ .mountPath }}"
+              name: "{{ .name }}"
+              {{- if .subPath }}
+              subPath: "{{ .subPath }}"
+              {{- end -}}
+          {{- end }}
+          {{- if .Values.emptyDir }}
             - mountPath: {{ .Values.emptyDir.mountPath }}
               name: emptydir-volume
           {{- end }}
@@ -190,8 +197,13 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.emptyDir }}
       volumes:
+      {{- range $volume := .Values.extraConfigMapVolumes }}
+      - name: {{ .name }}
+        configMap:
+          name: {{ .name }}
+      {{- end }}
+      {{- if .Values.emptyDir }}
       - name: emptydir-volume
         emptyDir:
           sizeLimit: {{ .Values.emptyDir.sizeLimit }}

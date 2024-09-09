@@ -110,6 +110,16 @@ env:
 extraConfigMaps: []
 extraSecrets: []
 
+# Mount ConfigMaps as files in the Deployment
+# Mount ca-bundle.pem from ca-cert-configmap to /etc/ssl/certs/ca-bundle.pem
+# - name: ca-cert-configmap
+#   mountPath: /etc/ssl/certs/ca-bundle.pem
+#   subPath: ca-bundle.pem
+# Mount all keys from ca-cert-configmap as files to /etc/ssl/certs
+# - name: ca-cert-configmap
+#   mountPath: /etc/ssl/certs/
+extraConfigMapVolumes: []
+
 externalSecret:
   enabled: false
     # data:
