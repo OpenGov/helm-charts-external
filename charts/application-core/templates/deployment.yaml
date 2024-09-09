@@ -158,9 +158,14 @@ spec:
           {{- range $volume := .Values.extraConfigMapVolumes }}
             - mountPath: "{{ .mountPath }}"
               name: "{{ .name }}"
+              {{- if eq .readOnly false }}
+              readOnly: false
+              {{- else }}
+              readOnly: true
+              {{- end }}
               {{- if .subPath }}
               subPath: "{{ .subPath }}"
-              {{- end -}}
+              {{- end }}
           {{- end }}
           {{- if .Values.emptyDir }}
             - mountPath: {{ .Values.emptyDir.mountPath }}
