@@ -93,6 +93,19 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.initContainer.resources | nindent 12 }}
+          volumeMounts:
+          {{- range $volume := .Values.extraConfigMapVolumes }}
+            - mountPath: "{{ .mountPath }}"
+              name: "{{ .name }}"
+              {{- if eq .readOnly false }}
+              readOnly: false
+              {{- else }}
+              readOnly: true
+              {{- end }}
+              {{- if .subPath }}
+              subPath: "{{ .subPath }}"
+              {{- end }}
+          {{- end }}
           terminationMessagePolicy: FallbackToLogsOnError
       {{- end }}
       containers:
