@@ -68,10 +68,8 @@ spec:
             - {{ . }}
           {{- end }}
           {{- end }}
-          {{- if or .Values.env }}
           env:
-            {{- .Values.env | toYaml | nindent 12 }}
-          {{- end }}
+          {{- include "application-core.env" . | nindent 12 }}
           {{- if or .Values.externalSecret.enabled .Values.configMap.enabled .Values.extraConfigMaps .Values.extraSecrets }}
           envFrom:
             {{- if .Values.configMap.enabled }}
@@ -124,6 +122,12 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+          {{- if .Values.startupProbe }}
+          {{- with .Values.livenessProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
           {{- if .Values.livenessProbe }}
           {{- with .Values.livenessProbe }}
           livenessProbe:
@@ -142,10 +146,8 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- end }}
-          {{- if or .Values.env }}
           env:
-            {{- .Values.env | toYaml | nindent 12 }}
-          {{- end }}
+          {{- include "application-core.env"  . | nindent 12 }}
           {{- if or .Values.externalSecret.enabled .Values.configMap.enabled .Values.extraConfigMaps .Values.extraSecrets }}
           envFrom:
             {{- if .Values.configMap.enabled }}

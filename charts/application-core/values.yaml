@@ -139,6 +139,14 @@ externalSecret:
     deletionPolicy: Retain
     template: {}
 
+startupProbe:  {}
+  # httpGet:
+  #   path: /api/v1/healthcheck
+  #   port: http
+  # failureThreshold: 30
+  # periodSeconds: 10
+
+
 livenessProbe:
   httpGet:
     path: /

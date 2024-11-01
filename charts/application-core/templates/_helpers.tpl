@@ -6,6 +6,26 @@ Expand the name of the chart.
 {{- end }}
 
 {{/*
+Build the env that gets injected into the containers
+If a user provides their own APP_NAME as an environment variable, use it.
+Otherwise, use the default APP_NAME which is .Release.Namespace-.Release.Name.
+*/}}
+{{- define "application-core.env" -}}
+{{ .Values.env | toYaml }}
+{{- $found := false }}
+{{- range .Values.env }}
+  {{- if eq .name "APP_NAME" }}
+    {{- $found = true }}
+  {{- end }}
+{{- end }}
+{{- if $found }}
+{{- else }}
+- name: APP_NAME
+  value: {{ .Release.Namespace }}-{{ .Release.Name }}
+{{- end }}
+{{- end }}
+
+{{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
