@@ -6,6 +6,17 @@ Expand the name of the chart.
 {{- end }}
 
 {{/*
+Build the env that gets injected into the deployments
+*/}}
+{{- define "application-core.env" -}}
+- name: APP_NAME
+  value: {{ .Values.appName | default (printf "%s-%s" .Release.Namespace .Release.Name) }}
+{{- if .Values.env }}
+{{ .Values.env | toYaml }}
+{{- end }}
+{{- end }}
+
+{{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.

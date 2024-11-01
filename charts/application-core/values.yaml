@@ -99,8 +99,12 @@ configMap:
 
 command: []
 
-env:
-  []
+# When unset APP_NAME will be set to {{.Release.Namespace}}-{{.Release.Name}}
+appName: ""
+
+env: []
+  # - name: FOO
+  #   value: bar
   # - name: FOO
   #   value: BAR
   # - name: BAZ
