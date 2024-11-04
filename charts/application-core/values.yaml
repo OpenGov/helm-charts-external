@@ -99,6 +99,8 @@ configMap:
 
 command: []
 
+appName: ""
+
 env: []
   # - name: FOO
   #   value: BAR
