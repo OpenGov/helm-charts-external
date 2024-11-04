@@ -6,11 +6,28 @@ Expand the name of the chart.
 {{- end }}
 
 {{/*
+Build the short stage name based off of the namespace
+*/}}
+{{- define "application-core.shortStage" }}
+{{- if contains "-production" .Release.Namespace }}
+{{- printf "%s" "prd" }}
+{{- else if contains "-staging" .Release.Namespace }}
+{{- printf "%s" "stg" }}
+{{- else if contains "-qa" .Release.Namespace }}
+{{- printf "%s" "qa" }}
+{{- else if contains "-development" .Release.Namespace }}
+{{- printf "%s" "dev" }}
+{{- else }}
+{{- printf "%s" .Release.Namespace }}
+{{- end }}
+{{- end }}
+
+{{/*
 Build the env that gets injected into the deployments
 */}}
 {{- define "application-core.env" -}}
 - name: APP_NAME
-  value: {{ .Values.appName | default (printf "%s-%s" .Release.Namespace .Release.Name) }}
+  value: {{ .Values.appName | default (printf "%s-%s" .Release.Name (include "application-core.shortStage" . )) }}
 {{- if .Values.env }}
 {{ .Values.env | toYaml }}
 {{- end }}
