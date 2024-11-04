@@ -17,5 +17,6 @@ type: application
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
 version: 4.2.5
 
+
 maintainers:
   - name: Dominic DePasquale
