@@ -11,7 +11,7 @@ Build the short stage name based off of the namespace
 {{- define "application-core.shortStage" }}
 {{- if contains "-production" .Release.Namespace }}
 {{- printf "%s" "prd" }}
-{{- if contains "-performance" .Release.Namespace }}
+{{- else if contains "-performance" .Release.Namespace }}
 {{- printf "%s" "perf" }}
 {{- else if contains "-integration" .Release.Namespace }}
 {{- printf "%s" "int" }}
