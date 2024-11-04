@@ -11,8 +11,14 @@ Build the short stage name based off of the namespace
 {{- define "application-core.shortStage" }}
 {{- if contains "-production" .Release.Namespace }}
 {{- printf "%s" "prd" }}
+{{- else if contains "-integration" .Release.Namespace }}
+{{- printf "%s" "int" }}
+{{- else if contains "-sandbox" .Release.Namespace }}
+{{- printf "%s" "sbx" }}
 {{- else if contains "-staging" .Release.Namespace }}
 {{- printf "%s" "stg" }}
+{{- else if contains "-demo" .Release.Namespace }}
+{{- printf "%s" "demo" }}
 {{- else if contains "-qa" .Release.Namespace }}
 {{- printf "%s" "qa" }}
 {{- else if contains "-development" .Release.Namespace }}
