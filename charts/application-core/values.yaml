@@ -120,6 +120,7 @@ extraSecrets: []
 # - name: ca-cert-configmap
 #   mountPath: /etc/ssl/certs/
 extraConfigMapVolumes: []
+extraSecretVolumes: []
 
 externalSecret:
   enabled: false

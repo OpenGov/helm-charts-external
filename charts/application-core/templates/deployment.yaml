@@ -182,6 +182,18 @@ spec:
               subPath: "{{ .subPath }}"
               {{- end }}
           {{- end }}
+          {{- range $volume := .Values.extraSecretVolumes }}
+            - mountPath: "{{ .mountPath }}"
+              name: "{{ .name }}"
+              {{- if eq .readOnly false }}
+              readOnly: false
+              {{- else }}
+              readOnly: true
+              {{- end }}
+              {{- if .subPath }}
+              subPath: "{{ .subPath }}"
+              {{- end }}
+          {{- end }}
           {{- if .Values.emptyDir }}
             - mountPath: {{ .Values.emptyDir.mountPath }}
               name: emptydir-volume
@@ -222,6 +234,11 @@ spec:
       - name: {{ .name }}
         configMap:
           name: {{ .name }}
+      {{- end }}
+      {{- range $volume := .Values.extraSecretVolumes }}
+      - name: {{ .name }}
+        secret:
+          secretName: {{ .name }}
       {{- end }}
       {{- if .Values.emptyDir }}
       - name: emptydir-volume
