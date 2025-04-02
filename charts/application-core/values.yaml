@@ -11,6 +11,12 @@ rollouts:
   # This is an opinionated template that uses the Linkerd metrics
   successRateTemplate:
     enabled: true
+    address: http://prometheus.monitoring.svc.cluster.local:9090
+    interval: 30s
+    successCondition: result[0] >= 0.95
+    count: 10
+    failureLimit: 2
+    consecutiveSuccessLimit: 2
 
 
 # Strategy to use for the rollout. This is only used when rollouts is enabled.

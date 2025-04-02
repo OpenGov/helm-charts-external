@@ -11,11 +11,11 @@ spec:
     - name: latest-hash
   metrics:
     - name: success-rate
-      interval: 30s
-      successCondition: result[0] >= 0.95
-      count: 10
-      failureLimit: 2
-      consecutiveSuccessLimit: 2
+      interval: {{ .Values.rollouts.successRateTemplate.interval  }}
+      successCondition: {{ .Values.rollouts.successRateTemplate.successCondition }}
+      count: {{ .Values.rollouts.successRateTemplate.count }}
+      failureLimit: {{ .Values.rollouts.successRateTemplate.failureLimit }}
+      consecutiveSuccessLimit: {{ .Values.rollouts.successRateTemplate.consecutiveSuccessLimit }}
       provider:
         prometheus:
           # TODO maybe make this an arg?
