@@ -1,5 +1,10 @@
+{{- if .Values.rollouts.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+{{- else }}
 apiVersion: apps/v1
 kind: Deployment
+{{- end }}
 metadata:
   name: {{ include "application-core.fullname" . }}
   labels:
@@ -12,10 +17,41 @@ metadata:
 spec:
   revisionHistoryLimit: 2
   progressDeadlineSeconds: 300
+  {{- if .Values.rollouts.enabled }}
+  {{- if .Values.rolloutsDeploymentStrategy }}
+  {{- with .Values.rolloutsDeploymentStrategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- else }}
+  strategy:
+    {{ .Values.rollouts.strategy }}:
+      activeService: {{ include "application-core.fullname" . }}
+      previewService: {{ include "application-core.fullname" . }}-preview
+      autoPromotionEnabled: {{ .Values.rollouts.autoPromotionEnabled | default true }}
+      {{- if .Values.rollouts.successRateTemplate.enabled }}
+      postPromotionAnalysis:
+        templates:
+          - templateName: {{ .Release.Name }}-success-rate
+        args:
+          - name: deployment
+            value: {{ include "application-core.fullname" . }}
+          - name: latest-hash
+            valueFrom:
+              podTemplateHashValue: "Latest"
+          - name: namespace
+            value: {{ .Release.Namespace }}
+      {{- end }}
+  {{- end }}
+  {{- end }}
+
+  {{- if ne (.Values.rollouts.enabled) true }}
   {{- with .Values.deploymentStrategy }}
   strategy:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+  {{- end }}
+
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}

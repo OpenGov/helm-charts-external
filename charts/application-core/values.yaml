@@ -2,12 +2,44 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# When rollouts is enabled, we replace the Deployment Object with a Rollout Object
+rollouts:
+  enabled: false
+  # When strategy is blueGreen the rollout will be. Currently only supports blueGreen
+  strategy: blueGreen
+  # Create a success-rate template and add it to postPromotionAnalysis
+  # This is an opinionated template that uses the Linkerd metrics
+  successRateTemplate:
+    enabled: true
+
+
+# Strategy to use for the rollout. This is only used when rollouts is enabled.
+# Overrides the default strategy for the rollout.
+rolloutsDeploymentStrategy: {}
+  # blueGreen:
+  #   activeService: pro-api1
+  #   previewService: pro-api1-preview
+  #   autoPromotionEnabled: true
+  #   postPromotionAnalysis:
+  #     templates:
+  #       - templateName: success-rate
+  #     args:
+  #       - name: deployment
+  #         value: "pro-api1"
+  #       - name: latest-hash
+  #         valueFrom:
+  #           podTemplateHashValue: "Latest"
+  #       - name: namespace
+  #         value: "pro-monorepo-test-development"
+
+
+
 replicaCount: 1
 
 image:
   repository: nginx
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
+  # Overrides  imagethe tag whose default is the chart appVersion.
   tag: ""
 
 imagePullSecrets: []

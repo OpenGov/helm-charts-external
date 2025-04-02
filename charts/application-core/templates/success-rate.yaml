@@ -1,0 +1,34 @@
+{{- if .Values.rollouts.enabled }}
+{{- if .Values.rollouts.successRateTemplate.enabled }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: {{ .Release.Name }}-success-rate
+spec:
+  args:
+    - name: deployment
+    - name: latest-hash
+  metrics:
+    - name: success-rate
+      interval: 30s
+      successCondition: result[0] >= 0.95
+      count: 10
+      failureLimit: 2
+      consecutiveSuccessLimit: 2
+      provider:
+        prometheus:
+          # TODO maybe make this an arg?
+          address: http://prometheus.linkerd-viz.svc.cluster.local:9090
+          query: |
+            sum(
+              irate(
+                response_total{classification="success", namespace="{{`{{args.namespace}}`}}", rollouts_pod_template_hash="{{`{{args.latest-hash}}`}}", direction="inbound"}[1m]
+                )
+              ) by (deployment) / sum(
+              irate(
+                response_total{namespace="{{`{{args.namespace}}`}}", rollouts_pod_template_hash="{{`{{args.latest-hash}}`}}", direction="inbound"}[1m])
+              ) by (deployment)
+
+{{- end }}
+{{- end }}
