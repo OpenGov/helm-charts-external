@@ -1,0 +1,33 @@
+{{- if .Values.rollouts.enabled }}
+{{- if .Values.rollouts.successRateTemplate.enabled }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: {{ .Release.Name }}-success-rate
+spec:
+  args:
+    - name: deployment
+    - name: latest-hash
+  metrics:
+    - name: success-rate
+      interval: {{ .Values.rollouts.successRateTemplate.interval  }}
+      successCondition: {{ .Values.rollouts.successRateTemplate.successCondition }}
+      count: {{ .Values.rollouts.successRateTemplate.count }}
+      failureLimit: {{ .Values.rollouts.successRateTemplate.failureLimit }}
+      consecutiveSuccessLimit: {{ .Values.rollouts.successRateTemplate.consecutiveSuccessLimit }}
+      provider:
+        prometheus:
+          address: {{ .Values.rollouts.successRateTemplate.address }}
+          query: |
+            sum(
+              irate(
+                response_total{classification="success", namespace="{{`{{args.namespace}}`}}", rollouts_pod_template_hash="{{`{{args.latest-hash}}`}}", direction="inbound"}[1m]
+                )
+              ) by (deployment) / sum(
+              irate(
+                response_total{namespace="{{`{{args.namespace}}`}}", rollouts_pod_template_hash="{{`{{args.latest-hash}}`}}", direction="inbound"}[1m])
+              ) by (deployment)
+
+{{- end }}
+{{- end }}
