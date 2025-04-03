@@ -9,6 +9,7 @@ rollouts:
   strategy: blueGreen
   # Create a success-rate template and add it to postPromotionAnalysis
   # This is an opinionated template that uses the Linkerd metrics
+  # If rolloutsDeploymentStrategy is set, these defaults will be overridden
   successRateTemplate:
     enabled: true
     address: http://prometheus.monitoring.svc.cluster.local:9090
