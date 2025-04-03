@@ -9,6 +9,7 @@ spec:
   args:
     - name: deployment
     - name: latest-hash
+    - name: namespace
   metrics:
     - name: success-rate
       interval: {{ .Values.rollouts.successRateTemplate.interval  }}
