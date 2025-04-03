@@ -19,7 +19,6 @@ rollouts:
     failureLimit: 2
     consecutiveSuccessLimit: 2
 
-
 # Strategy to use for the rollout. This is only used when rollouts is enabled.
 # Overrides the default strategy for the rollout.
 rolloutsDeploymentStrategy: {}
@@ -38,8 +37,6 @@ rolloutsDeploymentStrategy: {}
   #           podTemplateHashValue: "Latest"
   #       - name: namespace
   #         value: "pro-monorepo-test-development"
-
-
 
 replicaCount: 1
 
