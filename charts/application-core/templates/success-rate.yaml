@@ -18,8 +18,7 @@ spec:
       consecutiveSuccessLimit: {{ .Values.rollouts.successRateTemplate.consecutiveSuccessLimit }}
       provider:
         prometheus:
-          # TODO maybe make this an arg?
-          address: http://prometheus.linkerd-viz.svc.cluster.local:9090
+          address: {{ .Values.rollouts.successRateTemplate.address }}
           query: |
             sum(
               irate(
