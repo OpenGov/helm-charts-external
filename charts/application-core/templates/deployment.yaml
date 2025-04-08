@@ -34,8 +34,6 @@ spec:
         templates:
           - templateName: {{ .Release.Name }}-success-rate
         args:
-          - name: namespace
-            value: {{ .Release.Namespace }}
           - name: deployment
             value: {{ include "application-core.fullname" . }}
           - name: latest-hash
