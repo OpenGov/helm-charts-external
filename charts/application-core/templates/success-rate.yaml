@@ -23,11 +23,11 @@ spec:
           query: |
             sum(
               irate(
-                response_total{classification="success", namespace="{{`{{args.namespace}}`}}", rollouts_pod_template_hash="{{`{{args.latest-hash}}`}}", direction="inbound"}[1m]
+                response_total{classification="success", namespace="{{`{{args.namespace}}`}}", rollouts_pod_template_hash="{{`{{args.latest-hash}}`}}", direction="inbound"}[$__rate_interval]
                 )
               ) by (deployment) / sum(
               irate(
-                response_total{namespace="{{`{{args.namespace}}`}}", rollouts_pod_template_hash="{{`{{args.latest-hash}}`}}", direction="inbound"}[1m])
+                response_total{namespace="{{`{{args.namespace}}`}}", rollouts_pod_template_hash="{{`{{args.latest-hash}}`}}", direction="inbound"}[$__rate_interval])
               ) by (deployment)
 
 {{- end }}
