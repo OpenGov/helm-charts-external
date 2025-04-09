@@ -12,7 +12,7 @@ rollouts:
   # If rolloutsDeploymentStrategy is set, these defaults will be overridden
   successRateTemplate:
     enabled: true
-    address: http://prometheus.monitoring.svc.cluster.local:9090
+    address: http://prometheus-operated.monitoring.svc.cluster.local:9090
     interval: 30s
     successCondition: result[0] >= 0.95
     count: 10
