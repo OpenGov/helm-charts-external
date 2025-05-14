@@ -29,7 +29,13 @@ spec:
       activeService: {{ include "application-core.fullname" . }}
       previewService: {{ include "application-core.fullname" . }}-preview
       autoPromotionEnabled: {{ .Values.rollouts.autoPromotionEnabled | default true }}
-      {{- if .Values.rollouts.successRateTemplate.enabled }}
+      {{- if .Values.rollouts.prePromotionAnalysis.enabled }}
+      prePromotionAnalysis:
+        templates:
+          {{- toYaml .Values.rollouts.prePromotionAnalysis.templates | nindent 10 }}
+        args:
+          {{- toYaml .Values.rollouts.prePromotionAnalysis.args | nindent 10 }}
+      {{- end }}
       postPromotionAnalysis:
         templates:
           - templateName: {{ .Release.Name }}-success-rate
@@ -41,7 +47,6 @@ spec:
               podTemplateHashValue: "Latest"
           - name: namespace
             value: {{ .Release.Namespace }}
-      {{- end }}
   {{- end }}
   {{- end }}
 

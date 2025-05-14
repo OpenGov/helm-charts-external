@@ -1,0 +1,33 @@
+{{ if .Values.githubDeploymentHook.enabled }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-sync-hook
+  annotations:
+    opengov.com/argocd-hook: 'true'
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  template:
+    spec:
+      containers:
+        - name: github-deployment-hook
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          image: {{ .Values.githubDeploymentHook.image }}
+          env:
+            {{ include "application-core.github-deployment-hook.env" . | indent 12 }}
+            - name: DEPLOYMENT_STATE
+              value: 'in_progress'
+          resources:
+            requests:
+              memory: '64Mi'
+              cpu: '50m'
+            limits:
+              memory: '64Mi'
+      restartPolicy: Never
+{{- end }}
