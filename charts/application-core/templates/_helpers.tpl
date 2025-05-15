@@ -100,3 +100,36 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Build the Env vars that get sent to github-deployment-hook
+*/}}
+{{- define "application-core.github-deployment-hook.env" }}
+- name: ENVIRONMENT_URL
+  valueFrom:
+    configMapKeyRef:
+      name: {{ .Values.githubDeploymentHook.configMapName }}
+      key: {{ .Values.githubDeploymentHook.envUrlKey }}
+- name: LOG_URL
+  valueFrom:
+    configMapKeyRef:
+      name: {{ .Values.githubDeploymentHook.configMapName }}
+      key: {{ .Values.githubDeploymentHook.logUrlKey }}
+- name: ENVIRONMENT_NAME
+  valueFrom:
+    configMapKeyRef:
+      name: {{ .Values.githubDeploymentHook.configMapName }}
+      key: {{ .Values.githubDeploymentHook.environmentNameKey }}
+- name: GITHUB_REF
+  valueFrom:
+    configMapKeyRef:
+      name: {{ .Values.githubDeploymentHook.configMapName }}
+      key: {{ .Values.githubDeploymentHook.githubRefKey }}
+- name: GITHUB_REPO
+  value: {{ .Values.githubDeploymentHook.githubRepo }}
+- name: GITHUB_TOKEN
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.githubDeploymentHook.secretName }}
+      key: {{ .Values.githubDeploymentHook.githubTokenSecretKey }}
+{{- end }}

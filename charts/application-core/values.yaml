@@ -19,6 +19,22 @@ rollouts:
     failureLimit: 2
     consecutiveSuccessLimit: 2
 
+# Adds a Job that will run to update the Github Deployment Status
+githubDeploymentHook:
+  image: 918073871806.dkr.ecr.us-west-2.amazonaws.com/pro-github-deployment-hook:v0.1.1
+  enabled: false
+  githubRepo: 'opengov/repo'
+  # ConfigMapName that stores the environment name, log url, and github ref
+  # The keys in the configMap are used to set the environment variables
+  configMapName: github-deployment-hook
+  logUrlKey: log_url
+  environmentNameKey: environment
+  githubRefKey: ref
+  envUrlKey: env_url
+  # Secret that stores the Github Token
+  secretName: github-deployment-hook
+  githubTokenSecretKey: GITHUB_TOKEN
+
 # Strategy to use for the rollout. This is only used when rollouts is enabled.
 # Overrides the default strategy for the rollout.
 rolloutsDeploymentStrategy: {}
