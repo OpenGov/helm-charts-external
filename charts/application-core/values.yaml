@@ -56,6 +56,8 @@ rolloutsDeploymentStrategy: {}
 
 replicaCount: 1
 
+progressDeadlineSeconds: 300
+
 image:
   repository: nginx
   pullPolicy: IfNotPresent
