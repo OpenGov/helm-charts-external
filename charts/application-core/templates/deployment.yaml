@@ -16,7 +16,7 @@ metadata:
   {{- end }}
 spec:
   revisionHistoryLimit: 2
-  progressDeadlineSeconds: 300
+  progressDeadlineSeconds: {{ .Values.progressDeadlineSeconds | default 300 }}
   {{- if .Values.rollouts.enabled }}
   {{- if .Values.rolloutsDeploymentStrategy }}
   {{- with .Values.rolloutsDeploymentStrategy }}
