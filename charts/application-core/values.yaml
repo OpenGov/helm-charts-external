@@ -121,6 +121,11 @@ securityContext:
   # runAsUser: 1000
 
 service:
+  additionalPorts: []
+    # - port: 9876
+    #   targetPort: 9876
+    #   protocol: TCP
+    #   name: metrics
   enabled: true
   type: ClusterIP
   port: 8000
