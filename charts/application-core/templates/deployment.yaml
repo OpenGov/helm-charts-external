@@ -155,6 +155,12 @@ spec:
           {{- end }}
           {{- end }}
           ports:
+          {{- range .Values.service.additionalPorts }}
+            - port: {{ .port }}
+              targetPort: {{ .targetPort }}
+              protocol: {{ .protocol }}
+              name: {{ .name }}
+          {{- end }}
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
