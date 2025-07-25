@@ -156,7 +156,7 @@ spec:
           {{- end }}
           ports:
           {{- range .Values.service.additionalPorts }}
-            - port: {{ .port }}
+            - containerPort: {{ .port }}
               protocol: {{ .protocol }}
               name: {{ .name }}
           {{- end }}
