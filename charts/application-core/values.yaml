@@ -11,7 +11,7 @@ rollouts:
   # This is an opinionated template that uses the Linkerd metrics
   # If rolloutsDeploymentStrategy is set, these defaults will be overridden
   successRateTemplate:
-    enabled: true
+    enabled: false
     address: http://prometheus.monitoring.svc.cluster.local:9090
     interval: 30s
     successCondition: result[0] >= 0.95
