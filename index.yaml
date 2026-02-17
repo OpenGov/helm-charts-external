@@ -640,6 +640,18 @@ entries:
     urls:
     - https://github.com/OpenGov/helm-charts-external/releases/download/kube-janitor-0.1.0/kube-janitor-0.1.0.tgz
     version: 0.1.0
+  og-application:
+  - apiVersion: v2
+    created: "2026-02-17T11:10:01.864399631Z"
+    description: A Helm chart for XOPS Kubernetes Deployments
+    digest: 0ef1b4355f84482642f50b4c955f84f96e4f3d9a9e9eb7ae5de97d62c9b60794
+    maintainers:
+    - name: XOPS Platform Team
+    name: og-application
+    type: application
+    urls:
+    - https://github.com/OpenGov/helm-charts-external/releases/download/og-application-1.0.7/og-application-1.0.7.tgz
+    version: 1.0.7
   teleport-kube-agent:
   - apiVersion: v2
     appVersion: 10.1.4
@@ -871,4 +883,4 @@ entries:
     urls:
     - https://github.com/OpenGov/helm-charts-external/releases/download/zookeeper-2.1.4/zookeeper-2.1.4.tgz
     version: 2.1.4
-generated: "2025-08-21T17:10:30.753316412Z"
+generated: "2026-02-17T11:10:01.864747876Z"
