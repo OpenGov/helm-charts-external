@@ -1,0 +1,92 @@
+{{- if .Values.cronJob.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "og-application.fullname" . }}
+  labels:
+    {{- include "og-application.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.cronJob.schedule | quote }}
+  concurrencyPolicy: {{ .Values.cronJob.concurrencyPolicy | default "Forbid" }}
+  successfulJobsHistoryLimit: {{ .Values.cronJob.successfulJobsHistoryLimit | default 3 }}
+  failedJobsHistoryLimit: {{ .Values.cronJob.failedJobsHistoryLimit | default 1 }}
+  {{- if .Values.cronJob.suspend }}
+  suspend: {{ .Values.cronJob.suspend }}
+  {{- end }}
+  jobTemplate:
+    spec:
+      {{- if .Values.cronJob.ttlSecondsAfterFinished }}
+      ttlSecondsAfterFinished: {{ .Values.cronJob.ttlSecondsAfterFinished }}
+      {{- end }}
+      template:
+        metadata:
+          labels:
+            {{- include "og-application.selectorLabels" . | nindent 12 }}
+          {{- with .Values.cronJob.podAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        spec:
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          serviceAccountName: {{ include "og-application.serviceAccountName" . }}
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+          restartPolicy: {{ .Values.cronJob.restartPolicy | default "OnFailure" }}
+          containers:
+            - name: {{ include "og-application.fullname" . }}
+              securityContext:
+                {{- toYaml .Values.securityContext | nindent 16 }}
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              {{- if .Values.cronJob.command }}
+              command:
+                {{- toYaml .Values.cronJob.command | nindent 16 }}
+              {{- end }}
+              {{- if .Values.cronJob.args }}
+              args:
+                {{- toYaml .Values.cronJob.args | nindent 16 }}
+              {{- end }}
+              {{- if or .Values.cronJob.env .Values.env }}
+              env:
+                {{- if .Values.cronJob.env }}
+                {{- toYaml .Values.cronJob.env | nindent 16 }}
+                {{- end }}
+                {{- if .Values.env }}
+                {{- toYaml .Values.env | nindent 16 }}
+                {{- end }}
+              {{- end }}
+              {{- if or .Values.externalSecret.enabled .Values.configMap.enabled .Values.extraConfigMaps .Values.extraSecrets }}
+              envFrom:
+                {{- if .Values.configMap.enabled }}
+                - configMapRef:
+                    name: {{ include "og-application.fullname" . }}-cm
+                {{- end }}
+                {{- if .Values.externalSecret.enabled }}
+                - secretRef:
+                    name: {{ include "og-application.fullname" . }}-secrets
+                {{- end }}
+                {{- range $configMap := .Values.extraConfigMaps }}
+                - configMapRef:
+                    name: {{ $configMap }}
+                {{- end }}
+                {{- range $secret := .Values.extraSecrets }}
+                - secretRef:
+                    name: {{ $secret }}
+                {{- end }}
+              {{- end }}
+              {{- with .Values.cronJob.resources }}
+              resources:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}

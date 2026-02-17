@@ -1,0 +1,315 @@
+{{- if ne .Values.workloadType "statefulset" }}
+{{- if .Values.rollouts.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+{{- else }}
+apiVersion: apps/v1
+kind: Deployment
+{{- end }}
+metadata:
+  name: {{ include "og-application.fullname" . }}
+  labels:
+    {{- include "og-application.labels" . | nindent 4 }}
+  {{- with .Values.deploymentAnnotations }}
+  annotations:
+    {{- include "og-application.annotations" $ | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  revisionHistoryLimit: 2
+  progressDeadlineSeconds: {{ .Values.progressDeadlineSeconds | default 300 }}
+  {{- if .Values.rollouts.enabled }}
+  {{- if .Values.rolloutsDeploymentStrategy }}
+  {{- with .Values.rolloutsDeploymentStrategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- else }}
+  strategy:
+    {{ .Values.rollouts.strategy }}:
+      activeService: {{ include "og-application.fullname" . }}
+      previewService: {{ include "og-application.fullname" . }}-preview
+      autoPromotionEnabled: {{ .Values.rollouts.autoPromotionEnabled | default true }}
+      {{- if .Values.rollouts.successRateTemplate.enabled }}
+      postPromotionAnalysis:
+        templates:
+          - templateName: {{ .Release.Name }}-success-rate
+        args:
+          - name: deployment
+            value: {{ include "og-application.fullname" . }}
+          - name: latest-hash
+            valueFrom:
+              podTemplateHashValue: "Latest"
+          - name: namespace
+            value: {{ .Release.Namespace }}
+      {{- end }}
+  {{- end }}
+  {{- end }}
+
+  {{- if ne (.Values.rollouts.enabled) true }}
+  {{- with .Values.deploymentStrategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- end }}
+
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "og-application.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- toYaml .Values.podAnnotations | nindent 8 }}
+        {{- if .Values.emptyDir }}
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+        {{- end }}
+      labels:
+        {{- include "og-application.selectorLabels" . | nindent 8 }}
+    spec:
+      automountServiceAccountToken: false
+      dnsPolicy: ClusterFirst
+      {{- with .Values.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "og-application.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.initContainer.enabled }}
+      initContainers:
+        - name: {{ include "og-application.fullname" . }}-init
+          securityContext:
+            {{- toYaml .Values.initContainer.securityContext | nindent 12 }}
+          {{- if .Values.initContainer.image }}
+          image: "{{ .Values.initContainer.image.repository }}:{{ .Values.initContainer.image.tag }}"
+          {{- else }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.initContainer.args }}
+          args: 
+          {{- range .Values.initContainer.args }}
+            - {{ . }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.initContainer.command }}
+          command: 
+          {{- range .Values.initContainer.command }}
+            - {{ . }}
+          {{- end }}
+          {{- end }}
+          env:
+          {{- include "og-application.env" . | nindent 12 }}
+          {{- if or .Values.externalSecret.enabled .Values.configMap.enabled .Values.extraConfigMaps .Values.extraSecrets }}
+          envFrom:
+            {{- if .Values.configMap.enabled }}
+            - configMapRef:
+                name: {{ include "og-application.fullname" . }}-cm
+            {{- end }}
+            {{- if .Values.externalSecret.enabled }}
+            - secretRef:
+                name: {{ include "og-application.fullname" . }}-secrets
+            {{- end }}
+            {{- range $configMap := .Values.extraConfigMaps }}
+            - configMapRef:
+                name: {{ $configMap }}
+            {{- end }}
+            {{- range $secret := .Values.extraSecrets }}
+            - secretRef:
+                name: {{ $secret }}
+            {{- end }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.initContainer.resources | nindent 12 }}
+          volumeMounts:
+          {{- range $volume := .Values.extraConfigMapVolumes }}
+            - mountPath: "{{ .mountPath }}"
+              name: "{{ .name }}"
+              {{- if eq .readOnly false }}
+              readOnly: false
+              {{- else }}
+              readOnly: true
+              {{- end }}
+              {{- if .subPath }}
+              subPath: "{{ .subPath }}"
+              {{- end }}
+          {{- end }}
+          terminationMessagePolicy: FallbackToLogsOnError
+      {{- end }}
+      containers:
+        - name: {{ include "og-application.fullname" . }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.command }}
+          command:
+          {{- range .Values.command }}
+            - {{ . }}
+          {{- end }}
+          {{- end }}
+          ports:
+          {{- range .Values.service.additionalPorts }}
+            - containerPort: {{ .port }}
+              protocol: {{ .protocol }}
+              name: {{ .name }}
+          {{- end }}
+            - name: {{ .Values.service.portName | default "http" }}
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          {{- if .Values.startupProbe }}
+          {{- with .Values.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.livenessProbe }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.readinessProbe }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.lifecycle }}
+          {{- with .Values.lifecycle }}
+          lifecycle:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          env:
+          {{- include "og-application.env"  . | nindent 12 }}
+          {{- if or .Values.externalSecret.enabled .Values.configMap.enabled .Values.extraConfigMaps .Values.extraSecrets }}
+          envFrom:
+            {{- if .Values.configMap.enabled }}
+            - configMapRef:
+                name: {{ include "og-application.fullname" . }}-cm
+            {{- end }}
+            {{- if .Values.externalSecret.enabled }}
+            - secretRef:
+                name: {{ include "og-application.fullname" . }}-secrets
+            {{- end }}
+            {{- range $configMap := .Values.extraConfigMaps }}
+            - configMapRef:
+                name: {{ $configMap }}
+            {{- end }}
+            {{- range $secret := .Values.extraSecrets }}
+            - secretRef:
+                name: {{ $secret }}
+            {{- end }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          {{- range $volume := .Values.extraConfigMapVolumes }}
+            - mountPath: "{{ .mountPath }}"
+              name: "{{ .name }}"
+              {{- if eq .readOnly false }}
+              readOnly: false
+              {{- else }}
+              readOnly: true
+              {{- end }}
+              {{- if .subPath }}
+              subPath: "{{ .subPath }}"
+              {{- end }}
+          {{- end }}
+          {{- range $volume := .Values.extraSecretVolumes }}
+            - mountPath: "{{ .mountPath }}"
+              name: "{{ .name }}"
+              {{- if eq .readOnly false }}
+              readOnly: false
+              {{- else }}
+              readOnly: true
+              {{- end }}
+              {{- if .subPath }}
+              subPath: "{{ .subPath }}"
+              {{- end }}
+          {{- end }}
+          {{- if .Values.emptyDir }}
+            - mountPath: {{ .Values.emptyDir.mountPath }}
+              name: emptydir-volume
+          {{- end }}
+          {{- range .Values.emptyDirs }}
+            - mountPath: {{ .mountPath }}
+              name: {{ .name }}
+          {{- end }}
+          terminationMessagePolicy: FallbackToLogsOnError
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}
+      {{- else }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: "kubernetes.io/hostname"
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - {{ include "og-application.fullname" . }}
+      {{- end }}
+      {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml .Values.topologySpreadConstraints | nindent 8 }}
+      {{- else }}
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - {{ include "og-application.fullname" . }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      {{- range $volume := .Values.extraConfigMapVolumes }}
+      - name: {{ .name }}
+        configMap:
+          name: {{ .name }}
+      {{- end }}
+      {{- range $volume := .Values.extraSecretVolumes }}
+      - name: {{ .name }}
+        secret:
+          secretName: {{ .name }}
+      {{- end }}
+      {{- if .Values.emptyDir }}
+      - name: emptydir-volume
+        emptyDir:
+          sizeLimit: {{ .Values.emptyDir.sizeLimit }}
+      {{- end }}
+      {{- range .Values.emptyDirs }}
+      - name: {{ .name }}
+        emptyDir:
+          {{- if .medium }}
+          medium: {{ .medium }}
+          {{- end }}
+          {{- if .sizeLimit }}
+          sizeLimit: {{ .sizeLimit }}
+          {{- end }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+{{- end }}

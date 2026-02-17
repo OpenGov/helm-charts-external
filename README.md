@@ -1,5 +1,20 @@
 # External Helm Charts
 
+## Available Charts
+
+| Chart | Description |
+|-------|-------------|
+| [og-application](charts/og-application/) | XOPS Kubernetes deployments (Deployment, StatefulSet, ExternalSecret, SecretStore, Ingress, etc.) |
+| application-core | Kubernetes Deployments |
+| gradle-cache | Gradle cache |
+| ingress-nginx | Ingress NGINX |
+| jenkins | Jenkins |
+| karpenter | Karpenter |
+| kube-janitor | Kube Janitor |
+| temporal | Temporal |
+| vouch | Vouch |
+| zookeeper | Zookeeper |
+
 ## Usage with Helm
 
 1. Add the repo to helm repo list:
