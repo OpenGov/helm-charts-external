@@ -1,0 +1,357 @@
+# Default values for og-application.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Workload type: deployment or statefulset
+# Use 'statefulset' for stateful applications that need stable network identities and persistent storage
+workloadType: deployment
+
+# When rollouts is enabled, we replace the Deployment Object with a Rollout Object
+rollouts:
+  enabled: false
+  # When strategy is blueGreen the rollout will be. Currently only supports blueGreen
+  strategy: blueGreen
+  # Create a success-rate template and add it to postPromotionAnalysis
+  # This is an opinionated template that uses the Linkerd metrics
+  # If rolloutsDeploymentStrategy is set, these defaults will be overridden
+  successRateTemplate:
+    enabled: false
+    address: http://prometheus.monitoring.svc.cluster.local:9090
+    interval: 30s
+    successCondition: result[0] >= 0.95
+    count: 10
+    failureLimit: 2
+    consecutiveSuccessLimit: 2
+
+# Strategy to use for the rollout. This is only used when rollouts is enabled.
+# Overrides the default strategy for the rollout.
+rolloutsDeploymentStrategy: {}
+
+# Namespace configuration
+# Create namespace via helm template (labels/annotations added by kustomize commonAnnotations)
+# Example:
+#   namespace:
+#     create: true
+#     name: my-namespace
+namespace:
+  create: false
+  name: "" # Defaults to .Release.Namespace if empty
+
+replicaCount: 1
+
+progressDeadlineSeconds: 300
+
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 30%
+
+serviceAccount:
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+deploymentAnnotations:
+  reloader.stakater.com/auto: "true"
+
+deploymentStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 25%
+    maxSurge: 25%
+
+# Pod annotations (e.g. linkerd.io/inject, prometheus.io/scrape). Override in app values if needed.
+podAnnotations: {}
+
+dnsConfig: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+emptyDir: {}
+
+# Multiple emptyDir volumes (optional)
+# Example:
+# emptyDirs:
+#   - name: tmp
+#     mountPath: /tmp
+#     sizeLimit: 100Mi
+#   - name: cache
+#     mountPath: /cache
+#     medium: Memory
+#     sizeLimit: 100Mi
+#   - name: logs
+#     mountPath: /var/log
+emptyDirs: []
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]
+
+# Service configuration
+# port: External service port (what clients connect to)
+# targetPort: Container port (where app listens) - used for containerPort in deployment
+# Example: service.port: 80, service.targetPort: 3001 → Service:80 → Container:3001
+service:
+  additionalPorts: []
+  enabled: true
+  type: ClusterIP
+  port: 8000
+  portName: http # Name for the main port (e.g., http, backend, api)
+  targetPort: 8000 # Container port - should be numeric when different from port
+  annotations: {}
+
+sessionAffinity:
+  enabled: false
+  mode: persistent
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    external-dns.alpha.kubernetes.io/ingress-hostname-source: annotation-only
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+configMap:
+  enabled: true
+  data: {}
+
+command: []
+
+appName: ""
+
+env: []
+
+# extraConfigMaps and extraSecrets to be mounted as envFrom
+extraConfigMaps: []
+extraSecrets: []
+
+# Mount ConfigMaps as files in the Deployment
+extraConfigMapVolumes: []
+extraSecretVolumes: []
+
+# ExternalSecret configuration
+# Simplified format - secretStoreRef defaults to {fullname}-secret-store
+#
+# Example 1 - Minimal (auto-generates secretStoreRef):
+#   externalSecret:
+#     enabled: true
+#     secrets:
+#       DATABASE_URL: apps/my-app-secrets
+#       DB_PASSWORD: apps/my-app-secrets
+#
+# Example 2 - Custom secretStoreRef:
+#   externalSecret:
+#     enabled: true
+#     secretStoreRef:
+#       kind: ClusterSecretStore
+#       name: custom-secret-store
+#     secrets:
+#       DATABASE_URL: apps/my-app-secrets
+externalSecret:
+  enabled: true
+  # Simplified secrets format: PROPERTY_NAME: aws-secret-key
+  # Chart auto-generates secretStoreRef if not specified
+  secrets: {}
+  # Legacy verbose format (backward compatible)
+  data: []
+  refreshInterval: 1h
+  # secretStoreRef defaults to {fullname}-secret-store with kind: SecretStore
+  secretStoreRef:
+    kind: "" # Defaults to SecretStore
+    name: "" # Defaults to {fullname}-secret-store
+  target:
+    creationPolicy: Owner
+    deletionPolicy: Retain
+    template: {}
+
+startupProbe: {}
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+
+lifecycle:
+  preStop:
+    exec:
+      command: ["/bin/sh", "-c", "sleep 30"]
+
+terminationGracePeriodSeconds: 60
+
+resources: {}
+
+autoscaling:
+  enabled: false
+  type: "scaledobject"
+  minReplicas: 1
+  maxReplicas: 10
+
+nodeSelector: {}
+
+# Simplified anti-affinity configuration
+# Spreads pods across zones and/or hosts for high availability
+# Supports per-topology types (zoneType, hostType) or global type
+# Default: spreads across hosts with soft anti-affinity
+#
+# Example 1 - Same type for all (backward compatible):
+#   antiAffinity:
+#     spreadAcrossZones: true
+#     spreadAcrossHosts: true
+#     type: hard              # Both zones and hosts use hard anti-affinity
+#
+# Example 2 - Mixed types (new feature):
+#   antiAffinity:
+#     spreadAcrossZones: true
+#     zoneType: soft          # Soft for zones (preferred, won't block scheduling)
+#     spreadAcrossHosts: true
+#     hostType: hard          # Hard for hosts (required, pod stays Pending if not satisfied)
+antiAffinity:
+  spreadAcrossZones: true # Spread pods across AWS availability zones
+  spreadAcrossHosts: true # Spread pods across different nodes
+  type: soft # Global type: soft = preferred, hard = required
+  # zoneType: soft           # Override type for zone spreading (optional)
+  # hostType: soft           # Override type for host spreading (optional)
+
+# Custom affinity rules (advanced - overrides antiAffinity if set)
+# Use this only if you need complex affinity rules not covered by antiAffinity
+affinity: {}
+
+# Custom topology spread constraints (optional - defaults to zone spreading)
+# Example:
+# topologySpreadConstraints:
+#   - maxSkew: 1
+#     topologyKey: topology.kubernetes.io/zone
+#     whenUnsatisfiable: DoNotSchedule
+#     labelSelector:
+#       matchLabels:
+#         app.kubernetes.io/name: myapp
+topologySpreadConstraints: []
+
+tolerations: []
+
+initContainer:
+  enabled: false
+  args: []
+  command: []
+  resources: {}
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+
+# NetworkPolicy configuration
+# Simplified format with auto-generated common rules
+networkPolicy:
+  enabled: true
+
+  # Auto-generated rules (common for most apps)
+  allowPrometheusIngress: true # Allow monitoring/alloy to scrape :9000
+  allowDnsEgress: true # Allow DNS resolution (kube-system/kube-dns)
+  allowExternalEgress: false # Allow egress to external IPs (non-private)
+  externalEgressPorts: [443] # Ports for external egress (when enabled)
+
+  # Simplified ingress rules
+  # Example:
+  #   allowIngressFrom:
+  #     - app: frontend           # Allow from app.kubernetes.io/name: frontend
+  #       port: 8080
+  #     - namespace: other-ns     # Allow from namespace
+  #       port: 8080
+  #     - partOf: my-suite        # Allow from app.kubernetes.io/part-of label
+  #       port: 8080
+  allowIngressFrom: []
+
+  # Simplified egress rules
+  # Example:
+  #   allowEgressTo:
+  #     - app: database           # Allow to app.kubernetes.io/name: database
+  #       port: 5432
+  #     - namespace: redis-ns     # Allow to namespace
+  #       port: 6379
+  allowEgressTo: []
+
+  # Legacy verbose format (backward compatible)
+  ingress: []
+  egress: []
+
+# SecretStore configuration (for ExternalSecrets)
+secretStore:
+  enabled: true
+  # name: custom-secret-store-name  # Optional, defaults to {fullname}-secret-store
+  provider:
+    aws:
+      service: SecretsManager
+      region: us-west-2
+      auth:
+        jwt:
+          serviceAccountRef:
+            name: "" # Defaults to serviceAccount name if empty
+
+# CronJob configuration
+cronJob:
+  enabled: false
+  schedule: "0 0 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  suspend: false
+  restartPolicy: OnFailure
+  ttlSecondsAfterFinished: 86400
+  command: []
+  args: []
+  env: []
+  resources: {}
+  podAnnotations: {}
+
+# StatefulSet configuration (only used when workloadType: statefulset)
+statefulSet:
+  # Service name for the StatefulSet (required for stable network identity)
+  serviceName: "" # Defaults to release name if empty
+  # Pod management policy: OrderedReady or Parallel
+  podManagementPolicy: OrderedReady
+  # Update strategy
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  # Persistent volume claim templates for StatefulSet
+  # Example:
+  # volumeClaimTemplates:
+  #   - metadata:
+  #       name: data
+  #     spec:
+  #       accessModes: ["ReadWriteOnce"]
+  #       storageClassName: gp3
+  #       resources:
+  #         requests:
+  #           storage: 10Gi
+  volumeClaimTemplates: []
