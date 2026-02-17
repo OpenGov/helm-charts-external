@@ -18,10 +18,12 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.x
+          python-version: "3.x"
 
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2
+        with:
+          yamale_version: "6.1.0"  # 6.1.0+ supports Python 3.12+ (ast.Num removed)
 
       - name: Run chart-testing (list-changed)
         id: list-changed
