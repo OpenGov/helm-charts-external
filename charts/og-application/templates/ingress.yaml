@@ -9,16 +9,6 @@ metadata:
     {{- include "og-application.labels" . | nindent 4 }}
   annotations:
     {{- include "og-application.annotations" . | nindent 4 }}
-    {{- if eq (toString .Values.ingress.className) "nginx" }}
-    nginx.ingress.kubernetes.io/service-upstream: "true"
-    {{- if .Values.sessionAffinity.enabled }}
-    nginx.ingress.kubernetes.io/affinity: "cookie"
-    nginx.ingress.kubernetes.io/affinity-mode: {{ .Values.sessionAffinity.mode | default "balanced" }}
-    nginx.ingress.kubernetes.io/session-cookie-name: {{ .Values.sessionAffinity.cookieName | default "JSESSIONID" }}
-    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
-    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
-    {{- end }}
-    {{- end }}
   {{- with .Values.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
   {{- end }}

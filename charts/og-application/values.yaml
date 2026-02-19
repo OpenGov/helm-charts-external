@@ -333,7 +333,7 @@ networkPolicy:
 
 # SecretStore configuration (for ExternalSecrets) - namespaced
 secretStore:
-  enabled: true
+  enabled: false
   # name: custom-secret-store-name  # Optional, defaults to {fullname}-secret-store
   provider:
     aws:
@@ -347,18 +347,18 @@ secretStore:
 # ClusterSecretStore configuration (optional, cluster-scoped)
 # Use when you want this chart to create a ClusterSecretStore (e.g. shared by multiple namespaces).
 # Set externalSecret.secretStoreRef.kind: ClusterSecretStore and .name to clusterSecretStore.name to use it.
-clusterSecretStore:
-  enabled: false
-  name: "" # e.g. cluster-secret-store; required when enabled
-  provider:
-    aws:
-      service: SecretsManager
-      region: us-west-2
-      auth:
-        jwt:
-          serviceAccountRef:
-            name: ""   # SA name that has IRSA for Secrets Manager
-            namespace: "" # SA namespace (optional; often external-secrets)
+# clusterSecretStore:
+#   enabled: false
+#   name: "" # e.g. cluster-secret-store; required when enabled
+#   provider:
+#     aws:
+#       service: SecretsManager
+#       region: us-west-2
+#       auth:
+#         jwt:
+#           serviceAccountRef:
+#             name: ""   # SA name that has IRSA for Secrets Manager
+#             namespace: "" # SA namespace (optional; often external-secrets)
 
 # CronJob configuration
 cronJob:
