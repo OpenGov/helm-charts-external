@@ -67,12 +67,16 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
-Common labels
+Common labels (include namespace label; applied to all manifests)
 */}}
 {{- define "og-application.labels" -}}
 helm.sh/chart: {{ include "og-application.chart" . }}
 {{ include "og-application.selectorLabels" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+namespace: {{ .Release.Namespace }}
+{{- with .Values.commonLabels }}
+{{- toYaml . | nindent 0 }}
+{{- end }}
 {{- end }}
 
 {{/*
