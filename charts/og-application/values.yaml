@@ -147,7 +147,13 @@ ingress:
   #     alb.ingress.kubernetes.io/ssl-redirect: "443"
   #     alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:region:account:certificate/xxx"
   #     external-dns.alpha.kubernetes.io/hostname: "app.example.com"
-  #
+  #     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]' # GST asked us not to listen on port 80
+  #     alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:214286935198:certificate/7dddecd3-6f02-4555-bc46-97d4df9e496a, arn:aws:acm:us-west-2:214286935198:certificate/584e568b-cd1b-401f-b0b2-ba58b1db0c54
+  #     alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+  #   # redirect all HTTP to HTTPS
+  #     alb.ingress.kubernetes.io/ssl-redirect: '443'
+  #     alb.ingress.kubernetes.io/tags: environment=integration,department=rnd,suite=procurement,team=procurement,service=procurement
+  # #
   annotations: {}
   hosts:
     - host: chart-example.local
