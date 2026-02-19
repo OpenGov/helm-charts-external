@@ -153,6 +153,7 @@ ingress:
   #   # redirect all HTTP to HTTPS
   #     alb.ingress.kubernetes.io/ssl-redirect: '443'
   #     alb.ingress.kubernetes.io/tags: environment=integration,department=rnd,suite=procurement,team=procurement,service=procurement
+  #     alb.ingress.kubernetes.io/group.name: procurement-int-eks
   # #
   annotations: {}
   hosts:
