@@ -123,11 +123,39 @@ sessionAffinity:
   enabled: false
   mode: persistent
 
+# Ingress: set className to your ingress controller (e.g. nginx, alb).
+# Annotations depend on the controller; see examples below.
 ingress:
   enabled: true
-  className: "nginx"
-  annotations:
-    external-dns.alpha.kubernetes.io/ingress-hostname-source: annotation-only
+  # Set to your ingress class: "nginx", "alb", or cluster-specific value
+  className: ""
+  # Controller-specific annotation examples (uncomment and adjust as needed):
+  #
+  # NGINX Ingress (className: nginx):
+  #   annotations:
+  #     nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  #     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  #     nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+  #     cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  #     external-dns.alpha.kubernetes.io/hostname: "app.example.com"
+  #
+  # AWS ALB Ingress (className: alb):
+  #   annotations:
+  #     alb.ingress.kubernetes.io/scheme: internet-facing
+  #     alb.ingress.kubernetes.io/target-type: ip
+  #     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+  #     alb.ingress.kubernetes.io/ssl-redirect: "443"
+  #     alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:region:account:certificate/xxx"
+  #     external-dns.alpha.kubernetes.io/hostname: "app.example.com"
+  #     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]' # GST asked us not to listen on port 80
+  #     alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:214286935198:certificate/7dddecd3-6f02-4555-bc46-97d4df9e496a, arn:aws:acm:us-west-2:214286935198:certificate/584e568b-cd1b-401f-b0b2-ba58b1db0c54
+  #     alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+  #   # redirect all HTTP to HTTPS
+  #     alb.ingress.kubernetes.io/ssl-redirect: '443'
+  #     alb.ingress.kubernetes.io/tags: environment=integration,department=rnd,suite=procurement,team=procurement,service=procurement
+  #     alb.ingress.kubernetes.io/group.name: procurement-int-eks
+  # #
+  annotations: {}
   hosts:
     - host: chart-example.local
       paths:
@@ -303,9 +331,9 @@ networkPolicy:
   ingress: []
   egress: []
 
-# SecretStore configuration (for ExternalSecrets)
+# SecretStore configuration (for ExternalSecrets) - namespaced
 secretStore:
-  enabled: true
+  enabled: false
   # name: custom-secret-store-name  # Optional, defaults to {fullname}-secret-store
   provider:
     aws:
@@ -315,6 +343,22 @@ secretStore:
         jwt:
           serviceAccountRef:
             name: "" # Defaults to serviceAccount name if empty
+
+# ClusterSecretStore configuration (optional, cluster-scoped)
+# Use when you want this chart to create a ClusterSecretStore (e.g. shared by multiple namespaces).
+# Set externalSecret.secretStoreRef.kind: ClusterSecretStore and .name to clusterSecretStore.name to use it.
+# clusterSecretStore:
+#   enabled: false
+#   name: "" # e.g. cluster-secret-store; required when enabled
+#   provider:
+#     aws:
+#       service: SecretsManager
+#       region: us-west-2
+#       auth:
+#         jwt:
+#           serviceAccountRef:
+#             name: ""   # SA name that has IRSA for Secrets Manager
+#             namespace: "" # SA namespace (optional; often external-secrets)
 
 # CronJob configuration
 cronJob:
