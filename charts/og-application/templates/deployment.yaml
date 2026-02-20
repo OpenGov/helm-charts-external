@@ -62,7 +62,12 @@ spec:
   template:
     metadata:
       annotations:
+        {{- if .Values.configMap.enabled }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if .Values.podAnnotations }}
         {{- toYaml .Values.podAnnotations | nindent 8 }}
+        {{- end }}
         {{- if .Values.emptyDir }}
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
         {{- end }}

@@ -78,7 +78,7 @@ deploymentStrategy:
     maxUnavailable: 25%
     maxSurge: 25%
 
-# Pod annotations (e.g. linkerd.io/inject, prometheus.io/scrape). Override in app values if needed.
+# Pod annotations. Empty by default; add in your app values file as needed.
 podAnnotations: {}
 
 dnsConfig: {}
