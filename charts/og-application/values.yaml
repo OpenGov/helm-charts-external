@@ -51,6 +51,12 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+# Labels added to every manifest (Deployment, Service, Ingress, ConfigMap, etc.)
+# Chart always adds: helm.sh/chart, app.kubernetes.io/name, app.kubernetes.io/instance,
+# app.kubernetes.io/managed-by, namespace (release namespace)
+# Add extra labels here, e.g. team, environment, part-of
+commonLabels: {}
+
 podDisruptionBudget:
   enabled: true
   minAvailable: 30%
@@ -72,7 +78,7 @@ deploymentStrategy:
     maxUnavailable: 25%
     maxSurge: 25%
 
-# Pod annotations (e.g. linkerd.io/inject, prometheus.io/scrape). Override in app values if needed.
+# Pod annotations. Empty by default; add in your app values file as needed.
 podAnnotations: {}
 
 dnsConfig: {}
@@ -199,10 +205,17 @@ extraSecretVolumes: []
 #       name: custom-secret-store
 #     secrets:
 #       DATABASE_URL: apps/my-app-secrets
+#
+# Example 3 - Different AWS property name (same env var, avoid duplicate keys in one secret):
+#   When multiple apps use the same env var name but AWS secret has per-app keys (e.g. ABC_USER, DEF_USER),
+#   use "secretId::property" so the K8s Secret key (env var) can differ from the AWS property name:
+#   secrets:
+#     SPRING_DATASOURCE_USERNAME: shared-services-production/apps/nexus-ipfx::ABC_SPRING_DATASOURCE_USERNAME
+#   (K8s key = SPRING_DATASOURCE_USERNAME, AWS property = ABC_SPRING_DATASOURCE_USERNAME)
 externalSecret:
   enabled: true
-  # Simplified secrets format: PROPERTY_NAME: aws-secret-key
-  # Chart auto-generates secretStoreRef if not specified
+  # Simplified: K8S_SECRET_KEY: aws-secret-id  (AWS property = same as K8S_SECRET_KEY)
+  # Or: K8S_SECRET_KEY: aws-secret-id::AWS_PROPERTY_NAME  (AWS property can differ)
   secrets: {}
   # Legacy verbose format (backward compatible)
   data: []
