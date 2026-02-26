@@ -58,7 +58,7 @@ spec:
                 {{- toYaml .Values.env | nindent 16 }}
                 {{- end }}
               {{- end }}
-              {{- if or .Values.externalSecret.enabled .Values.configMap.enabled .Values.extraConfigMaps .Values.extraSecrets }}
+              {{- if or .Values.externalSecret.enabled .Values.configMap.enabled .Values.extraConfigMaps .Values.extraSecrets .Values.externalSecrets }}
               envFrom:
                 {{- if .Values.configMap.enabled }}
                 - configMapRef:
@@ -67,6 +67,10 @@ spec:
                 {{- if .Values.externalSecret.enabled }}
                 - secretRef:
                     name: {{ include "og-application.fullname" . }}-secrets
+                {{- end }}
+                {{- range .Values.externalSecrets }}
+                - secretRef:
+                    name: {{ .name }}
                 {{- end }}
                 {{- range $configMap := .Values.extraConfigMaps }}
                 - configMapRef:
