@@ -71,7 +71,7 @@ spec:
           {{- end }}
           env:
           {{- include "og-application.env" . | nindent 12 }}
-          {{- if or .Values.externalSecret.enabled .Values.configMap.enabled .Values.extraConfigMaps .Values.extraSecrets }}
+          {{- if or .Values.externalSecret.enabled .Values.configMap.enabled .Values.extraConfigMaps .Values.extraSecrets .Values.externalSecrets }}
           envFrom:
             {{- if .Values.configMap.enabled }}
             - configMapRef:
@@ -80,6 +80,10 @@ spec:
             {{- if .Values.externalSecret.enabled }}
             - secretRef:
                 name: {{ include "og-application.fullname" . }}-secrets
+            {{- end }}
+            {{- range .Values.externalSecrets }}
+            - secretRef:
+                name: {{ .name }}
             {{- end }}
             {{- range $configMap := .Values.extraConfigMaps }}
             - configMapRef:
@@ -130,7 +134,7 @@ spec:
               name: {{ .name }}
           {{- end }}
             - name: {{ .Values.service.portName | default "http" }}
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ .Values.service.targetPort | default .Values.service.port }}
               protocol: TCP
           {{- if .Values.startupProbe }}
           {{- with .Values.startupProbe }}
@@ -158,7 +162,7 @@ spec:
           {{- end }}
           env:
           {{- include "og-application.env"  . | nindent 12 }}
-          {{- if or .Values.externalSecret.enabled .Values.configMap.enabled .Values.extraConfigMaps .Values.extraSecrets }}
+          {{- if or .Values.externalSecret.enabled .Values.configMap.enabled .Values.extraConfigMaps .Values.extraSecrets .Values.externalSecrets }}
           envFrom:
             {{- if .Values.configMap.enabled }}
             - configMapRef:
@@ -167,6 +171,10 @@ spec:
             {{- if .Values.externalSecret.enabled }}
             - secretRef:
                 name: {{ include "og-application.fullname" . }}-secrets
+            {{- end }}
+            {{- range .Values.externalSecrets }}
+            - secretRef:
+                name: {{ .name }}
             {{- end }}
             {{- range $configMap := .Values.extraConfigMaps }}
             - configMapRef:

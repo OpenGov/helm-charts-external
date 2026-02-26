@@ -229,6 +229,24 @@ externalSecret:
     deletionPolicy: Retain
     template: {}
 
+# Additional ExternalSecrets (list). Each item creates a separate ExternalSecret with its own name.
+# externalSecrets:
+#   - name: db-secrets
+#     secretStoreRef:
+#       kind: ClusterSecretStore
+#       name: cluster-secret-store
+#     refreshInterval: 1h    # optional, defaults to 1h
+#     secrets:
+#       DB_USERNAME: platform-int-eks/apps/my-app
+#       DB_PASSWORD: platform-int-eks/apps/my-app
+#   - name: api-secrets
+#     secretStoreRef:
+#       kind: ClusterSecretStore
+#       name: cluster-secret-store
+#     secrets:
+#       API_KEY: platform-int-eks/apps/my-app-api
+externalSecrets: []
+
 startupProbe: {}
 
 livenessProbe:
