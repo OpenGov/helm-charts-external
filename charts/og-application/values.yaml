@@ -169,6 +169,76 @@ ingress:
           pathType: ImplementationSpecific
   tls: []
 
+# Gateway API HTTPRoute configuration
+# HTTPRoute connects your application to an existing Gateway in the cluster
+# (Gateway is managed by platform team and already deployed)
+#
+# Example configuration:
+#   httproute:
+#     enabled: true
+#     namespace: my-app  # Same as your service namespace
+#     parentRefs:
+#       - name: cpa-gateway  # Existing Gateway in cluster
+#         namespace: kgateway-system
+#     hostnames:
+#       - my-app.integration.engops.opengov.zone
+#     rules:
+#       - matches:
+#           - path:
+#               type: PathPrefix
+#               value: /
+#         timeouts:
+#           request: 60s
+#           backendRequest: 55s
+httproute:
+httproute:
+  enabled: false
+  # HTTPRoute namespace (default: Release.Namespace)
+  namespace: ""
+  # Additional labels for HTTPRoute resource
+  labels: {}
+  # Additional annotations for HTTPRoute resource
+  annotations: {}
+  # Parent Gateway references (required when enabled)
+  # Example:
+  # parentRefs:
+  #   - name: my-gateway
+  #     namespace: gateway-system
+  #   - name: external-gateway
+  #     namespace: gateway-system
+  #     sectionName: https
+  parentRefs: []
+  # Hostnames for routing (optional, can be inherited from Gateway)
+  hostnames: []
+  # Routing rules (required when enabled)
+  # Example:
+  # rules:
+  #   - matches:
+  #       - path:
+  #           type: PathPrefix
+  #           value: /api
+  #     backendRefs:
+  #       - name: api-service
+  #         port: 8080
+  #         weight: 90
+  #       - name: api-service-canary
+  #         port: 8080
+  #         weight: 10
+  #     timeouts:
+  #       request: 60s
+  #       backendRequest: 55s
+  #   - matches:
+  #       - path:
+  #           type: PathPrefix
+  #           value: /
+  #     filters:
+  #       - type: RequestRedirect
+  #         requestRedirect:
+  #           path:
+  #             type: ReplacePrefixMatch
+  #             replacePrefixMatch: /v2
+  rules: []
+
 configMap:
   enabled: true
   data: {}
