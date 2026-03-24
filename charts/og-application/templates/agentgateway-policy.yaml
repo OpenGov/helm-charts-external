@@ -1,0 +1,37 @@
+{{- if .Values.agentgatewayPolicy.enabled -}}
+{{- $fullName := include "og-application.fullname" . -}}
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: {{ .Values.agentgatewayPolicy.name | default (printf "body-size-%s" $fullName) }}
+  namespace: {{ .Values.agentgatewayPolicy.namespace | default "management" }}
+  labels:
+    {{- include "og-application.labels" . | nindent 4 }}
+  {{- with .Values.agentgatewayPolicy.labels }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  annotations:
+    {{- include "og-application.annotations" . | nindent 4 }}
+  {{- with .Values.agentgatewayPolicy.annotations }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  targetRefs:
+    {{- range .Values.agentgatewayPolicy.targetRefs }}
+    - group: {{ .group | default "gateway.networking.k8s.io" }}
+      kind: {{ .kind | default "HTTPRoute" }}
+      name: {{ .name | default $fullName }}
+      {{- if .namespace }}
+      namespace: {{ .namespace }}
+      {{- end }}
+    {{- end }}
+  {{- if .Values.agentgatewayPolicy.frontend }}
+  frontend:
+    {{- toYaml .Values.agentgatewayPolicy.frontend | nindent 4 }}
+  {{- end }}
+  {{- if .Values.agentgatewayPolicy.backend }}
+  backend:
+    {{- toYaml .Values.agentgatewayPolicy.backend | nindent 4 }}
+  {{- end }}
+{{- end }}

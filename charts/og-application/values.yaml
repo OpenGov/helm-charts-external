@@ -238,6 +238,48 @@ httproute:
   #             replacePrefixMatch: /v2
   rules: []
 
+# AgentgatewayPolicy: Custom policy for AgentGateway (body size, timeouts, etc.)
+# Only applies when using AgentGateway as your Gateway implementation
+# Example configuration:
+#   agentgatewayPolicy:
+#     enabled: true
+#     namespace: management  # Where Gateway lives
+#     targetRefs:
+#       - name: my-app  # HTTPRoute name to apply policy to
+#         namespace: platform  # HTTPRoute namespace
+#     frontend:
+#       http:
+#         maxBufferSize: 3145728  # 3MB max body size
+agentgatewayPolicy:
+  enabled: false
+  # Policy name (default: body-size-{fullname})
+  name: ""
+  # Policy namespace (default: management - where Gateway lives)
+  namespace: management
+  # Additional labels for AgentgatewayPolicy resource
+  labels: {}
+  # Additional annotations for AgentgatewayPolicy resource
+  annotations: {}
+  # Target HTTPRoute references (required when enabled)
+  # Example:
+  # targetRefs:
+  #   - name: my-app
+  #     namespace: platform
+  targetRefs: []
+  # Frontend policy (max body size, etc.)
+  # Example:
+  # frontend:
+  #   http:
+  #     maxBufferSize: 3145728  # 3MB
+  #     requestTimeout: 300s
+  frontend: {}
+  # Backend policy (connection timeouts, etc.)
+  # Example:
+  # backend:
+  #   http:
+  #     connectionTimeout: 10s
+  backend: {}
+
 configMap:
   enabled: true
   data: {}
