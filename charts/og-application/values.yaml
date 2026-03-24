@@ -191,7 +191,6 @@ ingress:
 #           request: 60s
 #           backendRequest: 55s
 httproute:
-httproute:
   enabled: false
   # HTTPRoute namespace (default: Release.Namespace)
   namespace: ""
