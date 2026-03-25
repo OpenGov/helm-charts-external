@@ -34,4 +34,8 @@ spec:
   backend:
     {{- toYaml .Values.agentgatewayPolicy.backend | nindent 4 }}
   {{- end }}
+  {{- if .Values.agentgatewayPolicy.retry }}
+  retry:
+    {{- toYaml .Values.agentgatewayPolicy.retry | nindent 4 }}
+  {{- end }}
 {{- end }}

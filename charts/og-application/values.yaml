@@ -192,6 +192,8 @@ ingress:
 #           backendRequest: 55s
 httproute:
   enabled: false
+  # HTTPRoute name (default: release name)
+  name: ""
   # HTTPRoute namespace (default: Release.Namespace)
   namespace: ""
   # Additional labels for HTTPRoute resource
@@ -201,55 +203,212 @@ httproute:
   # Parent Gateway references (required when enabled)
   # Example:
   # parentRefs:
-  #   - name: my-gateway
-  #     namespace: gateway-system
-  #   - name: external-gateway
-  #     namespace: gateway-system
-  #     sectionName: https
+  #   - name: staging-gateway
+  #     namespace: management
   parentRefs: []
   # Hostnames for routing (optional, can be inherited from Gateway)
   hostnames: []
   # Routing rules (required when enabled)
-  # Example:
+  #
+  # Basic path routing:
   # rules:
   #   - matches:
   #       - path:
   #           type: PathPrefix
   #           value: /api
   #     backendRefs:
-  #       - name: api-service
+  #       - name: my-service
   #         port: 8080
-  #         weight: 90
-  #       - name: api-service-canary
-  #         port: 8080
-  #         weight: 10
+  #         namespace: platform
   #     timeouts:
-  #       request: 60s
-  #       backendRequest: 55s
+  #       request: "900s"
+  #
+  # Method-based routing:
+  # rules:
+  #   - matches:
+  #       - path:
+  #           type: PathPrefix
+  #           value: /api/users
+  #         method: POST
+  #     backendRefs:
+  #       - name: user-service
+  #         port: 8080
+  #
+  # Query parameter matching:
+  # rules:
+  #   - matches:
+  #       - path:
+  #           type: PathPrefix
+  #           value: /api
+  #         queryParams:
+  #           - name: version
+  #             value: v2
+  #
+  # Header-based routing:
+  # rules:
+  #   - matches:
+  #       - path:
+  #           type: PathPrefix
+  #           value: /api
+  #         headers:
+  #           - name: X-API-Version
+  #             value: v2
+  #
+  # Traffic splitting (canary/blue-green):
+  # rules:
   #   - matches:
   #       - path:
   #           type: PathPrefix
   #           value: /
+  #     backendRefs:
+  #       - name: stable-service
+  #         port: 8080
+  #         weight: 90
+  #       - name: canary-service
+  #         port: 8080
+  #         weight: 10
+  #
+  # Request header modification:
+  # rules:
+  #   - matches:
+  #       - path:
+  #           type: PathPrefix
+  #           value: /api
   #     filters:
-  #       - type: RequestRedirect
-  #         requestRedirect:
+  #       - type: RequestHeaderModifier
+  #         requestHeaderModifier:
+  #           add:
+  #             - name: X-Custom-Header
+  #               value: custom-value
+  #           set:
+  #             - name: X-Request-ID
+  #               value: generated-id
+  #           remove:
+  #             - X-Internal-Header
+  #
+  # Response header modification:
+  # rules:
+  #   - filters:
+  #       - type: ResponseHeaderModifier
+  #         responseHeaderModifier:
+  #           add:
+  #             - name: X-Response-Time
+  #               value: "100ms"
+  #           remove:
+  #             - Server
+  #
+  # URL rewrite (path prefix replacement):
+  # rules:
+  #   - matches:
+  #       - path:
+  #           type: PathPrefix
+  #           value: /v1
+  #     filters:
+  #       - type: URLRewrite
+  #         urlRewrite:
   #           path:
   #             type: ReplacePrefixMatch
   #             replacePrefixMatch: /v2
+  #
+  # Request redirect:
+  # rules:
+  #   - matches:
+  #       - path:
+  #           type: PathPrefix
+  #           value: /old-path
+  #     filters:
+  #       - type: RequestRedirect
+  #         requestRedirect:
+  #           scheme: https
+  #           statusCode: 301
+  #           path:
+  #             type: ReplacePrefixMatch
+  #             replacePrefixMatch: /new-path
+  #
+  # Request mirroring (traffic shadowing):
+  # rules:
+  #   - backendRefs:
+  #       - name: production-service
+  #         port: 8080
+  #     filters:
+  #       - type: RequestMirror
+  #         requestMirror:
+  #           backendRef:
+  #             name: test-service
+  #             port: 8080
   rules: []
 
-# AgentgatewayPolicy: Custom policy for AgentGateway (body size, timeouts, etc.)
+# Multiple HTTPRoutes (for separate internal/external routing)
+# Example:
+# httproutes:
+#   - name: external-routes
+#     enabled: true
+#     namespace: platform
+#     parentRefs:
+#       - name: external-gateway
+#         namespace: management
+#     rules:
+#       - matches:
+#           - path:
+#               type: PathPrefix
+#               value: /api/public
+#         backendRefs:
+#           - name: my-service
+#             port: 8080
+#             namespace: platform
+#   - name: internal-routes
+#     enabled: true
+#     namespace: platform
+#     parentRefs:
+#       - name: internal-gateway
+#         namespace: management
+#     rules:
+#       - matches:
+#           - path:
+#               type: PathPrefix
+#               value: /api/internal
+#         backendRefs:
+#           - name: my-service
+#             port: 8080
+#             namespace: platform
+httproutes: []
+
+# AgentgatewayPolicy: Custom policy for AgentGateway (body size, timeouts, retries, etc.)
 # Only applies when using AgentGateway as your Gateway implementation
-# Example configuration:
+#
+# Basic body size configuration:
 #   agentgatewayPolicy:
 #     enabled: true
-#     namespace: management  # Where Gateway lives
+#     namespace: management
 #     targetRefs:
-#       - name: my-app  # HTTPRoute name to apply policy to
-#         namespace: platform  # HTTPRoute namespace
+#       - name: my-app
+#         namespace: platform
 #     frontend:
 #       http:
-#         maxBufferSize: 3145728  # 3MB max body size
+#         maxBufferSize: 3145728  # 3MB
+#
+# Advanced configuration with retries and timeouts:
+#   agentgatewayPolicy:
+#     enabled: true
+#     targetRefs:
+#       - name: my-app
+#         namespace: platform
+#     frontend:
+#       http:
+#         maxBufferSize: 10485760  # 10MB for large uploads
+#         requestTimeout: 300s
+#         idleTimeout: 60s
+#     backend:
+#       http:
+#         connectionTimeout: 10s
+#         maxConnections: 1000
+#     retry:
+#       attempts: 3
+#       backoff: 1s
+#       retryOn:
+#         - "5xx"
+#         - "reset"
+#         - "connect-failure"
 agentgatewayPolicy:
   enabled: false
   # Policy name (default: body-size-{fullname})
@@ -265,20 +424,36 @@ agentgatewayPolicy:
   # targetRefs:
   #   - name: my-app
   #     namespace: platform
+  #   - name: my-app-internal
+  #     namespace: platform
   targetRefs: []
-  # Frontend policy (max body size, etc.)
-  # Example:
-  # frontend:
+  # Frontend policy (client-facing settings)
+  # Common options:
   #   http:
-  #     maxBufferSize: 3145728  # 3MB
-  #     requestTimeout: 300s
+  #     maxBufferSize: 3145728        # Max request body size (bytes)
+  #     requestTimeout: 300s          # Total request timeout
+  #     idleTimeout: 60s              # Connection idle timeout
+  #     maxRequestHeaderSize: 8192    # Max header size (bytes)
   frontend: {}
-  # Backend policy (connection timeouts, etc.)
-  # Example:
-  # backend:
+  # Backend policy (upstream connection settings)
+  # Common options:
   #   http:
-  #     connectionTimeout: 10s
+  #     connectionTimeout: 10s        # Backend connection timeout
+  #     maxConnections: 1000          # Max connections to backend
+  #     maxPendingRequests: 1024      # Max pending requests
+  #     http2MaxRequests: 100         # Max HTTP/2 requests
   backend: {}
+  # Retry policy
+  # Example:
+  #   retry:
+  #     attempts: 3
+  #     backoff: 1s
+  #     retryOn:
+  #       - "5xx"
+  #       - "reset"
+  #       - "connect-failure"
+  #       - "retriable-4xx"
+  retry: {}
 
 configMap:
   enabled: true
