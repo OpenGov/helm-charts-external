@@ -173,23 +173,62 @@ ingress:
 # HTTPRoute connects your application to an existing Gateway in the cluster
 # (Gateway is managed by platform team and already deployed)
 #
-# Example configuration:
+# Example - Simple configuration:
 #   httproute:
 #     enabled: true
-#     namespace: my-app  # Same as your service namespace
+#     namespace: platform  # Your app namespace (same as service)
 #     parentRefs:
-#       - name: cpa-gateway  # Existing Gateway in cluster
-#         namespace: kgateway-system
-#     hostnames:
-#       - my-app.integration.engops.opengov.zone
+#       - name: staging-gateway  # Existing Gateway in cluster (staging/integration)
+#         namespace: management  # Gateway namespace (management for AgentGateway)
 #     rules:
 #       - matches:
 #           - path:
 #               type: PathPrefix
 #               value: /
+#         backendRefs:
+#           - name: my-app
+#             port: 8080
+#             namespace: platform
+#
+# Example - Multiple paths (like ace-service):
+#   httproute:
+#     enabled: true
+#     namespace: platform
+#     parentRefs:
+#       - name: staging-gateway
+#         namespace: management
+#     rules:
+#       - matches:
+#           - path:
+#               type: PathPrefix
+#               value: /auth/users
+#         backendRefs:
+#           - name: my-app
+#             port: 80
+#             namespace: platform
 #         timeouts:
-#           request: 60s
-#           backendRequest: 55s
+#           request: "900s"
+#       - matches:
+#           - path:
+#               type: PathPrefix
+#               value: /api/users
+#         backendRefs:
+#           - name: my-app
+#             port: 80
+#             namespace: platform
+#         timeouts:
+#           request: "900s"
+#
+# Example - Multiple parent gateways:
+#   httproute:
+#     parentRefs:
+#       - name: staging-gateway      # Attach to staging gateway
+#         namespace: management
+#       - name: internal-gateway     # Also attach to internal gateway
+#         namespace: management
+#
+# Note: parentRefs is a list - HTTPRoute can attach to multiple Gateways.
+# The template uses 'toYaml' to copy the list structure directly to the manifest.
 httproute:
   enabled: false
   # HTTPRoute name (default: release name)
@@ -201,9 +240,19 @@ httproute:
   # Additional annotations for HTTPRoute resource
   annotations: {}
   # Parent Gateway references (required when enabled)
-  # Example:
+  # This is a YAML list that maps directly to HTTPRoute spec.parentRefs
+  # Each item in the list becomes a Gateway that this HTTPRoute attaches to
+  #
+  # Single gateway (most common):
   # parentRefs:
   #   - name: staging-gateway
+  #     namespace: management
+  #
+  # Multiple gateways (route attaches to both):
+  # parentRefs:
+  #   - name: staging-gateway
+  #     namespace: management
+  #   - name: integration-gateway
   #     namespace: management
   parentRefs: []
   # Hostnames for routing (optional, can be inherited from Gateway)
@@ -339,13 +388,22 @@ httproute:
   rules: []
 
 # Multiple HTTPRoutes (for separate internal/external routing)
-# Example:
+# Use this when you need SEPARATE HTTPRoute resources for different gateways.
+#
+# When to use:
+# - Different gateways for internal vs external (security boundary)
+# - Separate HTTPRoutes for public API vs admin API
+#
+# Note: For multiple paths on the SAME gateway, use multiple rules in httproute.rules[]
+# (See ace-service example above with multiple rules in one HTTPRoute)
+#
+# Example - Separate HTTPRoutes for external/internal gateways:
 # httproutes:
-#   - name: external-routes
+#   - name: my-app-external
 #     enabled: true
 #     namespace: platform
 #     parentRefs:
-#       - name: external-gateway
+#       - name: staging-gateway  # External/public gateway
 #         namespace: management
 #     rules:
 #       - matches:
@@ -353,22 +411,22 @@ httproute:
 #               type: PathPrefix
 #               value: /api/public
 #         backendRefs:
-#           - name: my-service
+#           - name: my-app
 #             port: 8080
 #             namespace: platform
-#   - name: internal-routes
+#   - name: my-app-internal
 #     enabled: true
 #     namespace: platform
 #     parentRefs:
-#       - name: internal-gateway
+#       - name: internal-gateway  # Internal/admin gateway
 #         namespace: management
 #     rules:
 #       - matches:
 #           - path:
 #               type: PathPrefix
-#               value: /api/internal
+#               value: /api/admin
 #         backendRefs:
-#           - name: my-service
+#           - name: my-app
 #             port: 8080
 #             namespace: platform
 httproutes: []
