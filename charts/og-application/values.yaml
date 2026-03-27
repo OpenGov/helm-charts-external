@@ -178,8 +178,11 @@ ingress:
 #     enabled: true
 #     namespace: platform  # Your app namespace (same as service)
 #     parentRefs:
-#       - name: staging-gateway  # Existing Gateway in cluster (staging/integration)
-#         namespace: management  # Gateway namespace (management for AgentGateway)
+#       - name: staging-gateway      # Use gateway name based on environment:
+#         namespace: management      # - development-gateway (for dev environment)
+#                                    # - integration-gateway (for integration environment)
+#                                    # - staging-gateway (for staging environment)
+#                                    # - production-gateway (for production environment)
 #     rules:
 #       - matches:
 #           - path:
@@ -245,8 +248,9 @@ httproute:
   #
   # Single gateway (most common):
   # parentRefs:
-  #   - name: staging-gateway
-  #     namespace: management
+  #   - name: staging-gateway        # Gateway name based on environment:
+  #     namespace: management        # development-gateway, integration-gateway,
+  #                                  # staging-gateway, production-gateway
   #
   # Multiple gateways (route attaches to both):
   # parentRefs:
