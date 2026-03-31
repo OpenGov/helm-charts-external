@@ -1,0 +1,110 @@
+{{- if .Values.httproute.enabled -}}
+{{- $fullName := include "og-application.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+{{- $releaseNamespace := .Release.Namespace -}}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .Values.httproute.name | default $fullName }}
+  namespace: {{ .Values.httproute.namespace | default .Release.Namespace }}
+  labels:
+    {{- include "og-application.labels" . | nindent 4 }}
+  {{- with .Values.httproute.labels }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  annotations:
+    {{- include "og-application.annotations" . | nindent 4 }}
+  {{- with .Values.httproute.annotations }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.httproute.parentRefs }}
+  parentRefs:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.httproute.hostnames }}
+  hostnames:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- range .Values.httproute.rules }}
+    - {{- if .matches }}
+      matches:
+        {{- toYaml .matches | nindent 8 }}
+      {{- end }}
+      {{- if .filters }}
+      filters:
+        {{- toYaml .filters | nindent 8 }}
+      {{- end }}
+      backendRefs:
+        {{- if .backendRefs }}
+        {{- toYaml .backendRefs | nindent 8 }}
+        {{- else }}
+        - name: {{ .serviceName | default $fullName }}
+          namespace: {{ .serviceNamespace | default $releaseNamespace }}
+          port: {{ .servicePort | default $svcPort }}
+          {{- if .weight }}
+          weight: {{ .weight }}
+          {{- end }}
+        {{- end }}
+      {{- if .timeouts }}
+      timeouts:
+        {{- toYaml .timeouts | nindent 8 }}
+      {{- end }}
+    {{- end }}
+{{- end }}
+{{- range .Values.httproutes }}
+{{- if .enabled }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .name | required "httproutes[].name is required" }}
+  namespace: {{ .namespace | default $.Release.Namespace }}
+  labels:
+    {{- include "og-application.labels" $ | nindent 4 }}
+  {{- with .labels }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  annotations:
+    {{- include "og-application.annotations" $ | nindent 4 }}
+  {{- with .annotations }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .parentRefs }}
+  parentRefs:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .hostnames }}
+  hostnames:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- range .rules }}
+    - {{- if .matches }}
+      matches:
+        {{- toYaml .matches | nindent 8 }}
+      {{- end }}
+      {{- if .filters }}
+      filters:
+        {{- toYaml .filters | nindent 8 }}
+      {{- end }}
+      backendRefs:
+        {{- if .backendRefs }}
+        {{- toYaml .backendRefs | nindent 8 }}
+        {{- else }}
+        - name: {{ .serviceName | required "backendRefs serviceName is required when backendRefs not specified" }}
+          namespace: {{ .serviceNamespace | default $.Release.Namespace }}
+          port: {{ .servicePort | required "backendRefs servicePort is required when backendRefs not specified" }}
+          {{- if .weight }}
+          weight: {{ .weight }}
+          {{- end }}
+        {{- end }}
+      {{- if .timeouts }}
+      timeouts:
+        {{- toYaml .timeouts | nindent 8 }}
+      {{- end }}
+    {{- end }}
+---
+{{- end }}
+{{- end }}
