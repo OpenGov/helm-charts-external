@@ -755,6 +755,43 @@ cronJob:
   resources: {}
   podAnnotations: {}
 
+# Migration Job configuration (ArgoCD PreSync hook)
+# Runs a one-time Job before the Deployment is updated — typically for DB migrations.
+# Uses the same image as the main deployment. ConfigMap and ExternalSecret are
+# automatically mounted via envFrom when enabled.
+# Example:
+#   migrationJob:
+#     enabled: true
+#     command:
+#       - /bin/sh
+#       - -c
+#       - npm run migrate
+#     env:
+#       - name: DB_WAIT_RETRIES
+#         value: "30"
+#       - name: DB_WAIT_INTERVAL
+#         value: "2"
+migrationJob:
+  enabled: false
+  hook: PreSync
+  hookDeletePolicy: BeforeHookCreation
+  command: []
+  args: []
+  env: []
+  envFrom: []
+  annotations: {}
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 3600
+  restartPolicy: Never
+  # activeDeadlineSeconds: 600
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
 # StatefulSet configuration (only used when workloadType: statefulset)
 statefulSet:
   # Service name for the StatefulSet (required for stable network identity)
