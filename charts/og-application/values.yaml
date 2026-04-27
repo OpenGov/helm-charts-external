@@ -756,34 +756,79 @@ cronJob:
   podAnnotations: {}
 
 # Migration Job configuration (ArgoCD PreSync hook)
-# Runs a one-time Job before the Deployment is updated — typically for DB migrations.
-# Uses the same image as the main deployment. ConfigMap and ExternalSecret are
-# automatically mounted via envFrom when enabled.
-# Example:
+# Runs a one-time Job BEFORE the Deployment is updated — typically for DB migrations.
+#
+# How it works:
+#   - Uses the SAME image as the main Deployment (image.repository:image.tag).
+#   - Reuses the same ServiceAccount, podSecurityContext, and container securityContext.
+#   - When configMap.enabled=true,  the ConfigMap is auto-mounted via envFrom.
+#   - When externalSecret.enabled=true, the ExternalSecret is auto-mounted via envFrom.
+#   - ArgoCD runs it as a PreSync hook and deletes it before the next sync.
+#
+# REQUIRED when enabled: you MUST set `command` (and/or `args`).
+# If you leave command empty, the Job will start the image's default ENTRYPOINT/CMD —
+# which for an app image means it boots the application instead of running a migration.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# Example 1 — simple npm script (Node service):
 #   migrationJob:
 #     enabled: true
 #     command:
 #       - /bin/sh
 #       - -c
 #       - npm run migrate
+#
+# Example 2 — bun monorepo, needs to cd into a sub-package first:
+#   migrationJob:
+#     enabled: true
+#     command:
+#       - /bin/sh
+#       - -c
+#       - cd /app/packages/repo && bun run --conditions @opengov/bed-source scripts/migrate.ts
 #     env:
 #       - name: DB_WAIT_RETRIES
 #         value: "30"
 #       - name: DB_WAIT_INTERVAL
 #         value: "2"
+#
+# Example 3 — invoke a shell script baked into the image (e.g. atlas migrations):
+#   migrationJob:
+#     enabled: true
+#     command:
+#       - /bin/sh
+#       - -c
+#       - /app/packages/repo/scripts/migrate-from-pod.sh
+#
+# Example 4 — direct binary, no shell wrapper (use args for flags):
+#   migrationJob:
+#     enabled: true
+#     command: ["/app/bin/migrate"]
+#     args: ["--config", "/app/config/migrate.yaml", "up"]
+#
+# Tip: anything you used to write inline in a standalone migrate-job.yaml under
+# kargo/env/<env>/migrate-job.yaml moves into `command` here. The `cd <path>`
+# pattern stays inside the `sh -c` string — no separate workingDir field needed.
+# ─────────────────────────────────────────────────────────────────────────────
 migrationJob:
   enabled: false
-  hook: PreSync
-  hookDeletePolicy: BeforeHookCreation
+  hook: PreSync                           # PreSync | Sync | PostSync | SyncFail
+  hookDeletePolicy: BeforeHookCreation    # BeforeHookCreation | HookSucceeded | HookFailed
+  # The command the migration container runs. REQUIRED when enabled=true.
+  # Use the `/bin/sh -c "<script>"` form when you need shell features (cd, &&, env expansion).
   command: []
+  # Optional args appended to command. Most teams put everything in `command` with sh -c
+  # and leave args empty.
   args: []
+  # Extra env vars (in addition to ConfigMap + ExternalSecret which are auto-mounted).
   env: []
+  # Extra envFrom sources (ConfigMap/Secret refs are added automatically when enabled).
   envFrom: []
+  # Extra annotations on the Job (merged with the argocd hook annotations).
   annotations: {}
-  backoffLimit: 2
-  ttlSecondsAfterFinished: 3600
-  restartPolicy: Never
-  # activeDeadlineSeconds: 600
+  backoffLimit: 2                         # how many times to retry before failing the Job
+  ttlSecondsAfterFinished: 3600           # auto-delete the Job 1h after completion
+  restartPolicy: Never                    # Never | OnFailure
+  # activeDeadlineSeconds: 600            # hard timeout — uncomment to cap migration runtime
   resources:
     requests:
       cpu: 100m
