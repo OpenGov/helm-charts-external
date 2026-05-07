@@ -5,6 +5,10 @@ metadata:
   name: {{ include "og-application.fullname" . }}
   labels:
     {{- include "og-application.labels" . | nindent 4 }}
+  {{- with .Values.cronJob.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   schedule: {{ .Values.cronJob.schedule | quote }}
   concurrencyPolicy: {{ .Values.cronJob.concurrencyPolicy | default "Forbid" }}

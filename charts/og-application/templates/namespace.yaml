@@ -5,4 +5,8 @@ metadata:
   name: {{ .Values.namespace.name | default .Release.Namespace }}
   labels:
     {{- include "og-application.labels" . | nindent 4 }}
+  {{- with .Values.namespace.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 {{- end }}
