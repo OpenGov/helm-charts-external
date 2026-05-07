@@ -1,0 +1,64 @@
+{{- if .Values.migrationJob.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "og-application.fullname" . }}-migrate
+  labels:
+    {{- include "og-application.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/hook: {{ .Values.migrationJob.hook | default "PreSync" }}
+    argocd.argoproj.io/hook-delete-policy: {{ .Values.migrationJob.hookDeletePolicy | default "BeforeHookCreation" }}
+    {{- with .Values.migrationJob.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  backoffLimit: {{ .Values.migrationJob.backoffLimit | default 2 }}
+  ttlSecondsAfterFinished: {{ .Values.migrationJob.ttlSecondsAfterFinished | default 3600 }}
+  {{- if .Values.migrationJob.activeDeadlineSeconds }}
+  activeDeadlineSeconds: {{ .Values.migrationJob.activeDeadlineSeconds }}
+  {{- end }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "og-application.fullname" . }}-migrate
+        app.kubernetes.io/part-of: {{ include "og-application.fullname" . }}
+    spec:
+      restartPolicy: {{ .Values.migrationJob.restartPolicy | default "Never" }}
+      serviceAccountName: {{ include "og-application.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: migrate
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.migrationJob.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.migrationJob.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if or .Values.migrationJob.env .Values.migrationJob.envFrom .Values.configMap.enabled .Values.externalSecret.enabled }}
+          env:
+            {{- with .Values.migrationJob.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          envFrom:
+            {{- if .Values.configMap.enabled }}
+            - configMapRef:
+                name: {{ include "og-application.fullname" . }}-cm
+            {{- end }}
+            {{- if .Values.externalSecret.enabled }}
+            - secretRef:
+                name: {{ include "og-application.fullname" . }}-secrets
+            {{- end }}
+            {{- with .Values.migrationJob.envFrom }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.migrationJob.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+{{- end }}
