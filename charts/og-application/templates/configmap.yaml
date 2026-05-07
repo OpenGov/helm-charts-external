@@ -5,6 +5,10 @@ metadata:
   name: {{ include "og-application.fullname" . }}-cm
   labels:
     {{- include "og-application.labels" . | nindent 4 }}
+  {{- with .Values.configMap.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 data:
   {{- toYaml .Values.configMap.data | nindent 2 }}
 {{- end }}
