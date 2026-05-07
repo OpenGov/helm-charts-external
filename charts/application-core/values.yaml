@@ -152,6 +152,25 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+# Preview Ingress for Argo Rollouts blue-green deployments.
+# Routes to the preview Service so tests can validate new versions before traffic switch.
+# Requires rollouts.enabled and ingress.enabled to also be true.
+ingressPreview:
+  enabled: false
+  className: "nginx"
+  annotations:
+    external-dns.alpha.kubernetes.io/ingress-hostname-source: annotation-only
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: preview-chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: preview-chart-example-tls
+  #    hosts:
+  #      - preview-chart-example.local
+
 configMap:
   enabled: false
   data: {}

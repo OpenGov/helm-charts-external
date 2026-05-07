@@ -71,6 +71,7 @@ serviceAccount:
 
 deploymentAnnotations:
   reloader.stakater.com/auto: "true"
+  sidecar.signadot.com/inject: "true"
 
 deploymentStrategy:
   type: RollingUpdate
