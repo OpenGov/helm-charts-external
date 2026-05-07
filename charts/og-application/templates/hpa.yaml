@@ -5,6 +5,10 @@ metadata:
   name: {{ include "og-application.fullname" . }}
   labels:
     {{- include "og-application.labels" . | nindent 4 }}
+  {{- with .Values.autoscaling.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

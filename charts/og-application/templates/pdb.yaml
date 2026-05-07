@@ -6,6 +6,10 @@ metadata:
   name: {{ include "og-application.fullname" . }}
   labels:
     {{- include "og-application.labels" . | nindent 4 }}
+  {{- with .Values.podDisruptionBudget.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
   selector:
