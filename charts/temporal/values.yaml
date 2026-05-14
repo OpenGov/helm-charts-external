@@ -318,7 +318,7 @@ web:
 
   image:
     repository: temporalio/ui
-    tag: 2.16.2
+    tag: 2.49.1
     pullPolicy: IfNotPresent
 
   service:
