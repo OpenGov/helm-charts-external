@@ -176,7 +176,7 @@ ingressPreview:
 # Used alongside or as a replacement for the Ingress resource above.
 #
 # When httpRoute.enabled is true, an HTTPRoute is always created.
-# An AgentgatewayPolicy is ONLY created when cors.enabled or requestTimeout is set.
+# An AgentgatewayPolicy is ONLY created when any CORS config (allowOrigins, allowHeaders, etc.) or requestTimeout is provided.
 #
 # Example 1: Simple service (only HTTPRoute, no policy)
 #   httpRoute:
@@ -190,7 +190,6 @@ ingressPreview:
 #     hostnames:
 #       - api.procurement.ogintegration.us
 #     cors:
-#       enabled: true
 #       allowCredentials: true
 #       allowOrigins:
 #         - https://procurement.ogintegration.us
@@ -227,7 +226,6 @@ ingressPreview:
 #       - contract-doc-sync.procurement.ogintegration.us
 #     requestTimeout: "3600s"
 #     cors:
-#       enabled: true
 #       allowCredentials: true
 #       allowOrigins:
 #         - https://procurement.ogintegration.us
@@ -283,7 +281,6 @@ httpRoute:
   # Request timeout for AgentgatewayPolicy (e.g., "60s", "3600s")
   requestTimeout: ""
   cors:
-    enabled: false
     allowCredentials: false
     allowOrigins: []
     allowHeaders: []

@@ -1,5 +1,6 @@
 {{- if .Values.httpRoute.enabled -}}
-{{- if or .Values.httpRoute.cors.enabled .Values.httpRoute.requestTimeout -}}
+{{- $hasCors := or .Values.httpRoute.cors.allowOrigins .Values.httpRoute.cors.allowHeaders .Values.httpRoute.cors.allowMethods .Values.httpRoute.cors.allowCredentials -}}
+{{- if or $hasCors .Values.httpRoute.requestTimeout -}}
 {{- $fullName := include "application-core.fullname" . -}}
 apiVersion: agentgateway.dev/v1alpha1
 kind: AgentgatewayPolicy
@@ -15,9 +16,11 @@ spec:
       kind: HTTPRoute
       name: {{ $fullName }}
   traffic:
-    {{- if .Values.httpRoute.cors.enabled }}
+    {{- if $hasCors }}
     cors:
-      allowCredentials: {{ .Values.httpRoute.cors.allowCredentials | default false }}
+      {{- if .Values.httpRoute.cors.allowCredentials }}
+      allowCredentials: {{ .Values.httpRoute.cors.allowCredentials }}
+      {{- end }}
       {{- with .Values.httpRoute.cors.allowOrigins }}
       allowOrigins:
         {{- range . }}
