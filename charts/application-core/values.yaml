@@ -269,9 +269,13 @@ ingressPreview:
 #
 httpRoute:
   enabled: false
-  parentRefs:
-    - name: procurement-gateway
-      namespace: agentgateway-system
+  # parentRefs specifies which Gateway this HTTPRoute attaches to.
+  # Must be set per service — no default since Gateway name varies by team.
+  # Example:
+  #   parentRefs:
+  #     - name: procurement-gateway
+  #       namespace: agentgateway-system
+  parentRefs: []
   hostnames: []
   annotations: {}
   # Override rules for custom path routing; if omitted, defaults to
