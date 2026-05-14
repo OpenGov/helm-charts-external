@@ -181,12 +181,18 @@ ingressPreview:
 # Example 1: Simple service (only HTTPRoute, no policy)
 #   httpRoute:
 #     enabled: true
+#     parentRefs:
+#       - name: procurement-gateway
+#         namespace: agentgateway-system
 #     hostnames:
 #       - procurement.ogintegration.us
 #
 # Example 2: Service with CORS (HTTPRoute + AgentgatewayPolicy)
 #   httpRoute:
 #     enabled: true
+#     parentRefs:
+#       - name: procurement-gateway
+#         namespace: agentgateway-system
 #     hostnames:
 #       - api.procurement.ogintegration.us
 #     cors:
@@ -201,6 +207,9 @@ ingressPreview:
 # Example 3: Path-based routing (shared hostname, custom rules)
 #   httpRoute:
 #     enabled: true
+#     parentRefs:
+#       - name: procurement-gateway
+#         namespace: agentgateway-system
 #     hostnames:
 #       - api.procurement.ogintegration.us
 #     rules:
@@ -215,6 +224,9 @@ ingressPreview:
 # Example 4: Long timeout (websocket/streaming, HTTPRoute + AgentgatewayPolicy)
 #   httpRoute:
 #     enabled: true
+#     parentRefs:
+#       - name: procurement-gateway
+#         namespace: agentgateway-system
 #     hostnames:
 #       - sync.procurement.ogintegration.us
 #     requestTimeout: "3600s"
@@ -222,6 +234,9 @@ ingressPreview:
 # Example 5: Full AgentgatewayPolicy (CORS + timeout combined)
 #   httpRoute:
 #     enabled: true
+#     parentRefs:
+#       - name: procurement-gateway
+#         namespace: agentgateway-system
 #     hostnames:
 #       - contract-doc-sync.procurement.ogintegration.us
 #     requestTimeout: "3600s"
