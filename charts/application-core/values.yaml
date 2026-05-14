@@ -171,6 +171,141 @@ ingressPreview:
   #    hosts:
   #      - preview-chart-example.local
 
+# HTTPRoute for Gateway API (AgentGateway migration from NGINX Ingress).
+# Deploys an HTTPRoute resource that attaches to the procurement Gateway.
+# Used alongside or as a replacement for the Ingress resource above.
+#
+# When httpRoute.enabled is true, an HTTPRoute is always created.
+# An AgentgatewayPolicy is ONLY created when any CORS config (allowOrigins, allowHeaders, etc.) or requestTimeout is provided.
+#
+# Example 1: Simple service (only HTTPRoute, no policy)
+#   httpRoute:
+#     enabled: true
+#     parentRefs:
+#       - name: procurement-gateway
+#         namespace: agentgateway-system
+#     hostnames:
+#       - procurement.ogintegration.us
+#
+# Example 2: Service with CORS (HTTPRoute + AgentgatewayPolicy)
+#   httpRoute:
+#     enabled: true
+#     parentRefs:
+#       - name: procurement-gateway
+#         namespace: agentgateway-system
+#     hostnames:
+#       - api.procurement.ogintegration.us
+#     cors:
+#       allowCredentials: true
+#       allowOrigins:
+#         - https://procurement.ogintegration.us
+#       allowHeaders:
+#         - Content-Type
+#         - Authorization
+#         - traceparent
+#
+# Example 3: Path-based routing (shared hostname, custom rules)
+#   httpRoute:
+#     enabled: true
+#     parentRefs:
+#       - name: procurement-gateway
+#         namespace: agentgateway-system
+#     hostnames:
+#       - api.procurement.ogintegration.us
+#     rules:
+#       - matches:
+#           - path:
+#               type: PathPrefix
+#               value: /api/v1/search
+#         backendRefs:
+#           - name: pro-search-service
+#             port: 4001
+#
+# Example 4: Long timeout (websocket/streaming, HTTPRoute + AgentgatewayPolicy)
+#   httpRoute:
+#     enabled: true
+#     parentRefs:
+#       - name: procurement-gateway
+#         namespace: agentgateway-system
+#     hostnames:
+#       - sync.procurement.ogintegration.us
+#     requestTimeout: "3600s"
+#
+# Example 5: Full AgentgatewayPolicy (CORS + timeout combined)
+#   httpRoute:
+#     enabled: true
+#     parentRefs:
+#       - name: procurement-gateway
+#         namespace: agentgateway-system
+#     hostnames:
+#       - contract-doc-sync.procurement.ogintegration.us
+#     requestTimeout: "3600s"
+#     cors:
+#       allowCredentials: true
+#       allowOrigins:
+#         - https://procurement.ogintegration.us
+#         - https://assets.procurement.opengov.com
+#       allowHeaders:
+#         - DNT
+#         - Keep-Alive
+#         - User-Agent
+#         - X-Requested-With
+#         - If-Modified-Since
+#         - Cache-Control
+#         - Content-Type
+#         - Range
+#         - Authorization
+#         - traceparent
+#       allowMethods:
+#         - GET
+#         - POST
+#         - PUT
+#         - DELETE
+#         - OPTIONS
+#       maxAge: 86400
+#
+# This generates an AgentgatewayPolicy resource:
+#   apiVersion: agentgateway.dev/v1alpha1
+#   kind: AgentgatewayPolicy
+#   spec:
+#     targetRefs:
+#       - group: gateway.networking.k8s.io
+#         kind: HTTPRoute
+#         name: <service-name>
+#     traffic:
+#       cors:
+#         allowCredentials: true
+#         allowOrigins: [...]
+#         allowHeaders: [...]
+#         allowMethods: [...]
+#         maxAge: 86400
+#       timeouts:
+#         request: "3600s"
+#
+httpRoute:
+  enabled: false
+  # parentRefs specifies which Gateway this HTTPRoute attaches to.
+  # Must be set per service — no default since Gateway name varies by team.
+  # Example:
+  #   parentRefs:
+  #     - name: procurement-gateway
+  #       namespace: agentgateway-system
+  parentRefs: []
+  hostnames: []
+  annotations: {}
+  # Override rules for custom path routing; if omitted, defaults to
+  # PathPrefix "/" -> service fullname:service.port
+  rules: []
+  timeouts: {}
+  # Request timeout for AgentgatewayPolicy (e.g., "60s", "3600s")
+  requestTimeout: ""
+  cors:
+    allowCredentials: false
+    allowOrigins: []
+    allowHeaders: []
+    allowMethods: []
+    maxAge: null
+
 configMap:
   enabled: false
   data: {}
