@@ -171,6 +171,30 @@ ingressPreview:
   #    hosts:
   #      - preview-chart-example.local
 
+# HTTPRoute for Gateway API (AgentGateway migration from NGINX Ingress).
+# Deploys an HTTPRoute resource that attaches to the procurement Gateway.
+# Used alongside or as a replacement for the Ingress resource above.
+httpRoute:
+  enabled: false
+  parentRefs:
+    - name: procurement-gateway
+      namespace: agentgateway-system
+  hostnames: []
+  annotations: {}
+  # Override rules for custom path routing; if omitted, defaults to
+  # PathPrefix "/" -> service fullname:service.port
+  rules: []
+  timeouts: {}
+  # Request timeout for AgentgatewayPolicy (e.g., "60s", "3600s")
+  requestTimeout: ""
+  cors:
+    enabled: false
+    allowCredentials: false
+    allowOrigins: []
+    allowHeaders: []
+    allowMethods: []
+    maxAge: null
+
 configMap:
   enabled: false
   data: {}

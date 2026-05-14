@@ -1,0 +1,48 @@
+{{- if .Values.httpRoute.enabled -}}
+{{- if or .Values.httpRoute.cors.enabled .Values.httpRoute.requestTimeout -}}
+{{- $fullName := include "application-core.fullname" . -}}
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "application-core.labels" . | nindent 4 }}
+  annotations:
+    {{- include "application-core.annotations" $ | nindent 4 }}
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: {{ $fullName }}
+  traffic:
+    {{- if .Values.httpRoute.cors.enabled }}
+    cors:
+      allowCredentials: {{ .Values.httpRoute.cors.allowCredentials | default false }}
+      {{- with .Values.httpRoute.cors.allowOrigins }}
+      allowOrigins:
+        {{- range . }}
+        - {{ . | quote }}
+        {{- end }}
+      {{- end }}
+      {{- with .Values.httpRoute.cors.allowHeaders }}
+      allowHeaders:
+        {{- range . }}
+        - {{ . | quote }}
+        {{- end }}
+      {{- end }}
+      {{- with .Values.httpRoute.cors.allowMethods }}
+      allowMethods:
+        {{- range . }}
+        - {{ . | quote }}
+        {{- end }}
+      {{- end }}
+      {{- with .Values.httpRoute.cors.maxAge }}
+      maxAge: {{ . }}
+      {{- end }}
+    {{- end }}
+    {{- if .Values.httpRoute.requestTimeout }}
+    timeouts:
+      request: {{ .Values.httpRoute.requestTimeout | quote }}
+    {{- end }}
+{{- end }}
+{{- end }}
