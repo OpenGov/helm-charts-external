@@ -220,6 +220,55 @@ ingressPreview:
 #       - sync.procurement.ogintegration.us
 #     requestTimeout: "3600s"
 #
+# Example 5: Full AgentgatewayPolicy (CORS + timeout combined)
+#   httpRoute:
+#     enabled: true
+#     hostnames:
+#       - contract-doc-sync.procurement.ogintegration.us
+#     requestTimeout: "3600s"
+#     cors:
+#       enabled: true
+#       allowCredentials: true
+#       allowOrigins:
+#         - https://procurement.ogintegration.us
+#         - https://assets.procurement.opengov.com
+#       allowHeaders:
+#         - DNT
+#         - Keep-Alive
+#         - User-Agent
+#         - X-Requested-With
+#         - If-Modified-Since
+#         - Cache-Control
+#         - Content-Type
+#         - Range
+#         - Authorization
+#         - traceparent
+#       allowMethods:
+#         - GET
+#         - POST
+#         - PUT
+#         - DELETE
+#         - OPTIONS
+#       maxAge: 86400
+#
+# This generates an AgentgatewayPolicy resource:
+#   apiVersion: agentgateway.dev/v1alpha1
+#   kind: AgentgatewayPolicy
+#   spec:
+#     targetRefs:
+#       - group: gateway.networking.k8s.io
+#         kind: HTTPRoute
+#         name: <service-name>
+#     traffic:
+#       cors:
+#         allowCredentials: true
+#         allowOrigins: [...]
+#         allowHeaders: [...]
+#         allowMethods: [...]
+#         maxAge: 86400
+#       timeouts:
+#         request: "3600s"
+#
 httpRoute:
   enabled: false
   parentRefs:
