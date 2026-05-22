@@ -2,8 +2,8 @@
 {{- $hasCors := or .Values.httpRoute.cors.allowOrigins .Values.httpRoute.cors.allowHeaders .Values.httpRoute.cors.allowMethods .Values.httpRoute.cors.allowCredentials -}}
 {{- if or $hasCors .Values.httpRoute.requestTimeout -}}
 {{- $fullName := include "application-core.fullname" . -}}
-apiVersion: agentgateway.dev/v1alpha1
-kind: AgentgatewayPolicy
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
 metadata:
   name: {{ $fullName }}
   labels:
