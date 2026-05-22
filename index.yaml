@@ -2,6 +2,17 @@ apiVersion: v1
 entries:
   application-core:
   - apiVersion: v2
+    created: "2026-05-22T13:20:34.915725965Z"
+    description: A Helm chart for Kubernetes Deployments
+    digest: f4feb93d4bef4e94c8ff73ec6c50ae67ed60dc0b141b47255aa8e0ef8e5e9315
+    maintainers:
+    - name: Dann Bohn
+    name: application-core
+    type: application
+    urls:
+    - https://github.com/OpenGov/helm-charts-external/releases/download/application-core-4.6.9/application-core-4.6.9.tgz
+    version: 4.6.9
+  - apiVersion: v2
     created: "2026-05-14T11:54:08.135977512Z"
     description: A Helm chart for Kubernetes Deployments
     digest: 8590946a708544c7bcfc1a07722d3d32f690bf0f5b39f6bb1d64079dc0dcc86e
@@ -982,4 +993,4 @@ entries:
     urls:
     - https://github.com/OpenGov/helm-charts-external/releases/download/zookeeper-2.1.4/zookeeper-2.1.4.tgz
     version: 2.1.4
-generated: "2026-05-14T11:54:08.13640421Z"
+generated: "2026-05-22T13:20:34.916137461Z"
