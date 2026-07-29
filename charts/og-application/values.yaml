@@ -663,7 +663,7 @@ initContainer:
 # NetworkPolicy configuration
 # Simplified format with auto-generated common rules
 networkPolicy:
-  enabled: true
+  enabled: false
 
   # Auto-generated rules (common for most apps)
   allowPrometheusIngress: true # Allow monitoring/alloy to scrape :9000
