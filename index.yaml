@@ -675,6 +675,17 @@ entries:
     version: 0.1.0
   og-application:
   - apiVersion: v2
+    created: "2026-07-29T11:53:16.951491699Z"
+    description: A Helm chart for XOPS Kubernetes Deployments
+    digest: 643ea2f8902cecb09918ccac7161de5876027fa1e754ab2fe2d8493bcb8a0182
+    maintainers:
+    - name: XOPS Platform Team
+    name: og-application
+    type: application
+    urls:
+    - https://github.com/OpenGov/helm-charts-external/releases/download/og-application-1.0.17/og-application-1.0.17.tgz
+    version: 1.0.17
+  - apiVersion: v2
     created: "2026-07-09T06:45:07.43730105Z"
     description: A Helm chart for XOPS Kubernetes Deployments
     digest: 55340bcb85b3f514599c3ab77fe9d7c6536bced75a83c85f8f8af2a3ff34e2f4
@@ -1015,4 +1026,4 @@ entries:
     urls:
     - https://github.com/OpenGov/helm-charts-external/releases/download/zookeeper-2.1.4/zookeeper-2.1.4.tgz
     version: 2.1.4
-generated: "2026-07-09T06:45:07.437756816Z"
+generated: "2026-07-29T11:53:16.951900634Z"
